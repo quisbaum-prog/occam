@@ -1,0 +1,20 @@
+{
+  "name": "occam",
+  "version": "1.0.0",
+  "description": "Token economy for Claude Code: build less, work lean, talk less. Stdlib first, generate instead of enumerate. POSIX sh hooks, no runtime dependencies.",
+  "author": {
+    "name": "quisbaum-prog",
+    "url": "https://github.com/quisbaum-prog"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/quisbaum-prog/occam",
+  "repository": "https://github.com/quisbaum-prog/occam",
+  "keywords": [
+    "tokens",
+    "cost",
+    "efficiency",
+    "yagni",
+    "stdlib",
+    "hooks"
+  ]
+}

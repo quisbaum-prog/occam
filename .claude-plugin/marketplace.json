@@ -1,0 +1,15 @@
+{
+  "name": "occam",
+  "owner": {
+    "name": "quisbaum-prog",
+    "url": "https://github.com/quisbaum-prog"
+  },
+  "plugins": [
+    {
+      "name": "occam",
+      "source": "./plugin",
+      "description": "Token economy for Claude Code: build less, work lean, talk less.",
+      "category": "productivity"
+    }
+  ]
+}
