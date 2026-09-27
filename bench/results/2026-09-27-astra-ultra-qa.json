@@ -1,0 +1,34 @@
+{
+  "completed_cells": 54,
+  "valid_cells": 54,
+  "matched_fixture_groups": 18,
+  "identical_task_prompt_groups": 18,
+  "original_scenarios_and_verifiers_unchanged": true,
+  "runner_hash_matches_launched_source": true,
+  "root_stream_matches_root_rollout_cells": 54,
+  "sessions": 102,
+  "complete_usage_cells": 53,
+  "incomplete_usage_cells": [
+    "bigfile-s2-baseline-r0"
+  ],
+  "arms": {
+    "baseline": {
+      "n": 18,
+      "original_pass": 14,
+      "after_adjudication_pass": 16,
+      "complete_usage": 17
+    },
+    "ponytail": {
+      "n": 18,
+      "original_pass": 15,
+      "after_adjudication_pass": 17,
+      "complete_usage": 18
+    },
+    "occam": {
+      "n": 18,
+      "original_pass": 16,
+      "after_adjudication_pass": 18,
+      "complete_usage": 18
+    }
+  }
+}
