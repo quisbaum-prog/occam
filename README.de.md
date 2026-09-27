@@ -40,7 +40,7 @@ Ist Ponytail installiert, vorher entfernen (`/plugin uninstall ponytail@ponytail
 
 Ausprobieren ohne Installation, aus einem Klon: `claude --plugin-dir ./plugin`
 
-Braucht nur `sh`, `cat` und `awk` (unter Windows Git Bash, das Claude Code ohnehin nutzt). Kein Node und kein Python für die Hooks.
+Das Plugin nutzt zwei Hooks: `SessionStart` lädt die Regeln (auch nach `/clear` und Kompaktierung), `SubagentStart` gibt Subagents eine Kurzfassung von rund 100 Tokens. Beide laufen über ein 14-zeiliges POSIX-`sh`-Skript, das nur `sh`, `cat` und `awk` braucht (unter Windows Git Bash, das Claude Code ohnehin nutzt). Kein Node, kein Python, und bei einzelnen Prompts läuft nichts; Ponytail nutzt drei Node.js-Hooks, einen davon bei jedem Prompt.
 
 ## Bedienung
 
@@ -54,12 +54,11 @@ Braucht nur `sh`, `cat` und `awk` (unter Windows Git Bash, das Claude Code ohneh
 
 Das Audit läuft auch direkt im Terminal: `python3 plugin/tools/audit.py --days 30`. Es liest deine Transkripte unter `~/.claude/projects` und zeigt Kosten nach Token-Typ, die **Kontext-Steuer** pro Tool (was ein Tool-Output kostet, weil jeder spätere Turn ihn erneut liest), die teuersten Einzel-Outputs und typische Muster wie ganz gelesene große Dateien, laute Installationen und doppelt gelesene Dateien. Vorher und nachher laufen lassen, dann siehst du die Wirkung an deinen eigenen Sessions.
 
-## In der Claude-App (claude.ai, Desktop)
+## Desktop-App, Cowork und Chat
 
-Hooks gibt es dort nicht. Zwei Wege:
-
-- **Immer aktiv:** [`app/preferences.txt`](app/preferences.txt) (129 Wörter) in die persönlichen Präferenzen einfügen.
-- **Auf Abruf:** [`app/occam/`](app/occam) als Skill hochladen. Skills laden nur, wenn das Modell sie für passend hält; JetBrains hat für Ponytail als reinen Skill null Aktivierungen in zehn Sessions gemessen. Der Präferenztext ist deshalb der verlässlichere Weg.
+- **Desktop-App, Code-Tab:** Das ist Claude Code, Plugin und Hooks funktionieren genau wie im Terminal. Dieselben `/plugin`-Befehle ins Eingabefeld, oder in den Plugin-Einstellungen der App den Marketplace `quisbaum-prog/occam` hinzufügen.
+- **Cowork:** Cowork-Plugins unterstützen ebenfalls `SessionStart`-Hooks, dasselbe Plugin sollte dort also funktionieren (nicht gebenchmarkt).
+- **Reiner Chat (claude.ai, Mobil):** keine Plugins, also keine Hooks. Für „immer aktiv“ [`app/preferences.txt`](app/preferences.txt) (129 Wörter) in die persönlichen Präferenzen einfügen, für „auf Abruf“ [`app/occam/`](app/occam) als Skill hochladen. Skills laden nur, wenn das Modell sie für passend hält; JetBrains hat für Ponytail als reinen Skill null Aktivierungen in zehn Sessions gemessen. Der Präferenztext ist deshalb der verlässlichere Weg.
 
 ## Die Regeln
 
@@ -81,7 +80,7 @@ plugin/
   skills/occam/SKILL.md    /occam:occam full|lite|off
   skills/audit/SKILL.md    /occam:audit [tage]
   tools/audit.py           Transkript-Analyse, nur Stdlib
-app/                       Präferenztext und Skill für die Claude-App
+app/                       Präferenztext und Skill für den reinen Chat
 bench/                     der Benchmark, nur Stdlib
 assets/                    README-Grafik, erzeugt von bench/chart.py
 ```
