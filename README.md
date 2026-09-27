@@ -221,6 +221,10 @@ One Opus 5.5 session at effort max costs about $0.07–2.00 at list price; the f
 - [Ponytail](https://github.com/DietrichGebert/ponytail) by Dietrich Gebert: the "lazy senior dev" ladder and the pattern of injecting rules through a SessionStart hook. Occam borrows the idea, not the code.
 - [JetBrains' independent Ponytail benchmark](https://blog.jetbrains.com/ai/2026/07/ponytail-skill-claude-tested/), which showed that re-reading context dominates an agent's bill.
 
+## Support
+
+Occam is free. If it saves you tokens, you can [sponsor the project on GitHub](https://github.com/sponsors/quisbaum-prog); it pays for benchmark runs on new models.
+
 ## License
 
 [MIT](LICENSE)
