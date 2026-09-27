@@ -1,9 +1,12 @@
-"""Render the README chart (median cost per scenario and arm) as light and dark SVG. Stdlib only.
+"""Render the README charts as light and dark SVG. Stdlib only.
 
-    python3 chart.py results/opus-r1.jsonl ../assets
+    python3 chart.py results/opus-r1.jsonl ../assets   # median cost per scenario and arm
+    python3 chart.py compare ../assets                 # paired change vs. no plugin, per model
 """
 import json, statistics as st, sys
 from pathlib import Path
+
+import bench as B
 
 ARMS = [("occam", "Occam"), ("ponytail", "Ponytail 4.10"), ("baseline", "no plugin")]
 THEMES = {  # series steps validated for colour-vision deficiency on light and dark surfaces
@@ -50,8 +53,77 @@ def svg(data, c):
     return "\n".join(o + ["</svg>"]) + "\n"
 
 
+def load(src):
+    return [json.loads(l) for l in Path(src).read_text().splitlines() if l.strip()]
+
+
+def codex_total(r):  # incomplete usage (interrupted subagent) is excluded, as in report_codex.py
+    return r["all_usage"].get("total") if r.get("usage_complete") and r.get("valid_run") else None
+
+
+# (label, metric, result file relative to this script, value per run)
+SETUPS = [
+    ("Claude Opus 5.5, effort max", "cost", "results/opus-r1.jsonl", lambda r: r["cost"]),
+    ("Claude Opus 5.5, effort medium", "cost", "results/opus-medium.jsonl", lambda r: r["cost"]),
+    ("Claude Haiku 4.5", "cost", "results/haiku-v1.jsonl", lambda r: r["cost"]),
+    ("GPT-6 Astra in Codex, effort ultra", "total tokens", "results/2026-09-27-astra-ultra.jsonl", codex_total),
+]
+
+
+def paired(rows, arm, get):
+    by = {}
+    for r in rows:
+        by.setdefault((r["scenario"], r["seed"], r["rep"]), {})[r["arm"]] = r
+    ratios = [get(g[arm]) / get(g["baseline"]) for g in by.values()
+              if arm in g and "baseline" in g and get(g[arm]) and get(g["baseline"])]
+    return (*B.gmean_ci(ratios), len(ratios))
+
+
+def pct(v):  # typographic minus, as in the README
+    return f"{v:+.0f}%".replace("-", "\u2212")
+
+
+def compare_svg(data, c):
+    W, lw, top, row, lo, hi = 760, 230, 70, 64, -60, 60
+    arms = ARMS[:2]
+    H = top + len(data) * row + 34
+    sx = lambda pct: lw + (pct - lo) / (hi - lo) * (W - lw - 50)
+    o = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" font-family="{FONT}">',
+         f'<text x="0" y="16" font-size="15" font-weight="600" fill="{c["ink"]}">Change vs. no plugin, geometric mean of paired tasks with 95% interval</text>']
+    x = 0
+    for a, label in arms:
+        o.append(f'<circle cx="{x + 5}" cy="36" r="5" fill="{c[a]}"/>'
+                 f'<text x="{x + 17}" y="40" font-size="13" fill="{c["muted"]}">{label}</text>')
+        x += 17 + 7 * len(label) + 22
+    for v in range(lo, hi + 1, 20):
+        o.append(f'<line x1="{sx(v):.1f}" x2="{sx(v):.1f}" y1="{top - 8}" y2="{H - 26}" stroke="{c["grid"]}" '
+                 f'stroke-width="{2 if v == 0 else 1}"/>'
+                 f'<text x="{sx(v):.1f}" y="{H - 8}" font-size="12" text-anchor="middle" fill="{c["muted"]}">{pct(v) if v else "0%"}</text>')
+    for i, (label, metric, res) in enumerate(data):
+        y = top + i * row
+        o.append(f'<text x="0" y="{y + 16}" font-size="13" font-weight="600" fill="{c["ink"]}">{label}</text>'
+                 f'<text x="0" y="{y + 33}" font-size="12" fill="{c["muted"]}">{metric}, {res["occam"][3]} task pairs</text>')
+        for j, (a, name) in enumerate(arms):
+            m, l, h, n = (v if k == 3 else (v - 1) * 100 for k, v in enumerate(res[a]))
+            yy = y + 10 + j * 18
+            o.append(f'<g><title>{label}, {name}: {pct(m)} [{pct(l)[:-1]} … {pct(h)[:-1]}], {n} pairs</title>'
+                     f'<line x1="{sx(l):.1f}" x2="{sx(h):.1f}" y1="{yy}" y2="{yy}" stroke="{c[a]}" stroke-width="2"/>'
+                     f'<circle cx="{sx(m):.1f}" cy="{yy}" r="5" fill="{c[a]}"/></g>'
+                     f'<text x="{sx(h) + 8:.1f}" y="{yy + 4}" font-size="12" font-weight="600" fill="{c["ink"]}">{pct(m)}</text>')
+    return "\n".join(o + ["</svg>"]) + "\n"
+
+
+def compare(out):
+    here = Path(__file__).parent
+    data = [(label, metric, {a: paired(load(here / src), a, get) for a, _ in ARMS[:2]})
+            for label, metric, src, get in SETUPS]
+    Path(out).mkdir(parents=True, exist_ok=True)
+    for theme, colors in THEMES.items():
+        Path(out, f"change-by-model-{theme}.svg").write_text(compare_svg(data, colors))
+
+
 def main(src, out):
-    rows = [json.loads(l) for l in Path(src).read_text().splitlines() if l.strip()]
+    rows = load(src)
     data = {}
     for s in sorted({r["scenario"] for r in rows}):
         data[s] = {a: (st.median(r["cost"] for r in rows if r["scenario"] == s and r["arm"] == a),
@@ -62,4 +134,4 @@ def main(src, out):
 
 
 if __name__ == "__main__":
-    main(*sys.argv[1:3])
+    compare(sys.argv[2]) if sys.argv[1] == "compare" else main(*sys.argv[1:3])
