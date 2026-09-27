@@ -1,8 +1,12 @@
 # Occam
 
-**Token-Ökonomie für Claude Code.** Ein Regelwerk von rund 650 Tokens, das bei jedem Sessionstart geladen wird: weniger bauen, schlank arbeiten, knapp reden. Stdlib vor Abhängigkeit, generieren statt aufzählen, einmal prüfen und aufhören.
-
 [English](README.md)
+
+**Ockhams Rasiermesser für Claude Code:** Entitäten dürfen nicht über das Notwendige hinaus vermehrt werden.
+
+Sich selbst überlassen, vermehrt ein Coding-Agent sie alle: Dateien, Abhängigkeiten, Tool-Calls, Turns, Kontext, Wörter. Für jede davon zahlst du in Tokens, für die meisten bei jedem weiteren Turn gleich noch einmal. Occam ist ein Regelwerk von 30 Zeilen (rund 650 Tokens), das bei jedem Sessionstart geladen wird und Claude Code sagt: weniger bauen, schlank arbeiten, knapp reden.
+
+Auf Claude Opus 5.5 hat es die Kosten pro Aufgabe halbiert, und jeder Test lief durch. Ohne Plugin ist dasselbe Modell zweimal an derselben Aufgabe gescheitert: Es sollte vier kopierte Exporter aufräumen und hat die Datei dabei länger gemacht.
 
 Gemessen in echten headless Claude-Code-Sessions auf **Claude Opus 5.5 mit Effort max** (18 Aufgabenpaare, 95 %-Konfidenzintervall):
 
@@ -23,9 +27,9 @@ Occam direkt gegen Ponytail: **−34 %** Kosten [−41 … −25]. Bestätigt au
 
 Eine Agent-Session zahlt dreimal:
 
-1. **Output, vor allem Thinking.** Auf Opus 5.5 mit Effort max waren das in jedem Arm rund 47 % der Kosten.
-2. **Cache-Writes.** Jeder neue Kontext (Tool-Output, Nachrichten, Thinking-Blöcke) wird einmal zum doppelten Input-Preis in den 1-Stunden-Cache geschrieben (35–42 %).
-3. **Cache-Reads.** Danach liest *jeder weitere* Turn alles erneut (6–8 %).
+1. **Output, vor allem Thinking.** Auf Opus 5.5 mit Effort max war Thinking allein in jedem Arm 45–48 % der Kosten.
+2. **Cache-Writes.** Jeder neue Kontext (Tool-Output, Nachrichten, Thinking-Blöcke) wird einmal zum doppelten Input-Preis in den 1-Stunden-Cache geschrieben (31–37 %).
+3. **Cache-Reads.** Danach liest *jeder weitere* Turn alles erneut (5–7 %).
 
 Ponytail setzt beim Code an, den der Agent schreibt. Occam zusätzlich bei der Arbeitsweise: weniger Turns, gezieltes Lesen statt ganzer Dateien, leiser Tool-Output, keine Zweitmeinungen beim Prüfen, ein Generator statt dreißig handgeschriebener Dateien. Der Großteil der Ersparnis kommt aus halbiertem Thinking und halbierten Turns.
 
@@ -82,7 +86,7 @@ plugin/
   tools/audit.py           Transkript-Analyse, nur Stdlib
 app/                       Präferenztext und Skill für den reinen Chat
 bench/                     der Benchmark, nur Stdlib
-assets/                    README-Grafik, erzeugt von bench/chart.py
+assets/                    README-Grafik (erzeugt von bench/chart.py), Social-Preview-Bild
 ```
 
 ## Benchmark
@@ -101,7 +105,7 @@ assets/                    README-Grafik, erzeugt von bench/chart.py
 | refactor | vier kopierte CSV-Exporter zusammenführen, Verhalten unverändert | Verhalten ändern oder nicht kürzen |
 | bigfile | eine Regel in einem 2.500-Zeilen-Modul deckeln | ganze Datei lesen oder neu schreiben |
 
-Ein versteckter Verifier bewertet jeden Lauf. Jeder Verifier ist selbst getestet: Er muss am unberührten Workspace scheitern und mit einer Referenzlösung bestehen (`python3 bench/selftest.py`, 54/54).
+Ein versteckter Verifier bewertet jeden Lauf. Jeder Verifier ist selbst getestet: Er muss am unberührten Workspace scheitern und mit einer Referenzlösung bestehen (54/54 über die Seeds 1–6: `python3 bench/selftest.py 1 2 3 4 5 6`).
 
 Median-Kosten pro Aufgabe auf Opus 5.5 mit Effort max (USD zum Listenpreis, zwei Seeds):
 

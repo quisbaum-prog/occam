@@ -4,6 +4,9 @@
     "name": "quisbaum-prog",
     "url": "https://github.com/quisbaum-prog"
   },
+  "metadata": {
+    "description": "Occam's razor for Claude Code: build less, work lean, talk less."
+  },
   "plugins": [
     {
       "name": "occam",
