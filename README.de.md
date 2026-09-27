@@ -23,7 +23,21 @@ Occam direkt gegen Ponytail: **−34 %** Kosten [−41 … −25]. Bestätigt au
   <img alt="Median-Kosten pro Aufgabe auf Claude Opus 5.5: Occam ist in allen neun Szenarien am günstigsten" src="assets/cost-per-scenario-light.svg">
 </picture>
 
-**Andere Modelle und Effort-Stufen:** Occam war in jeder Runde der günstigste Arm (in Codex: die wenigsten Tokens) und hat mindestens so viele Tests bestanden wie die anderen Arme: −11 % Kosten auf Opus 5.5 mit Effort medium, −23 % Tokens auf GPT-6 Astra in Codex, keine signifikante Änderung auf Haiku 4.5. [Alle Runden](#andere-modelle-und-effort-stufen)
+**Andere Modelle und Effort-Stufen.** Dieselben neun Aufgaben, jeweils gepaart gegen ohne Plugin. Occam war in jeder Runde der günstigste Arm (in Codex: die wenigsten Tokens) und hat mindestens so viele Tests bestanden wie die anderen Arme. Am größten ist die Ersparnis auf Opus mit Effort max, wo Thinking den größten Teil der Rechnung ausmacht.
+
+| Runde | Gemessen | Occam | Ponytail 4.10 | Tests bestanden: ohne Plugin / Occam / Ponytail |
+|---|---|---|---|---|
+| [Opus 5.5, Effort max](#opus-55-mit-effort-max) | Kosten | **−51 %** [−58 … −42] | −26 % [−35 … −14] | 16 / 18 / 18 |
+| [Opus 5.5, Effort medium](#opus-55-mit-effort-medium) | Kosten | **−11 %** [−17 … −5] | +11 % [+2 … +20] | 17 / 18 / 18 |
+| [GPT-6 Astra, Effort ultra (Codex)](#gpt-6-astra-in-codex) | Gesamttokens | **−23 %** [−34 … −10] | +20 % [−2 … +51] | 14 / 16 / 15 ¹ |
+| Haiku 4.5 | Kosten | −2 % [−9 … +4] | +30 % [+7 … +56] | 10 / 13 / 10 |
+
+¹ Nach der dokumentierten Quellenprüfung 16 / 18 / 17: Der Verifier der question-Aufgabe lehnt ein korrektes `3.5%` ab.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/change-by-model-dark.svg">
+  <img alt="Veränderung gegenüber ohne Plugin: Occam −51 % Kosten auf Opus 5.5 mit Effort max, −11 % mit Effort medium, −2 % auf Haiku 4.5 und −23 % Tokens auf GPT-6 Astra; Ponytail −26 %, +11 %, +30 % und +20 %" src="assets/change-by-model-light.svg">
+</picture>
 
 ## Warum das funktioniert
 
@@ -109,6 +123,8 @@ assets/                    README-Grafiken (erzeugt von bench/chart.py), Social-
 
 Ein versteckter Verifier bewertet jeden Lauf. Jeder Verifier ist selbst getestet: Er muss am unberührten Workspace scheitern und mit einer Referenzlösung bestehen (54/54 über die Seeds 1–6: `python3 bench/selftest.py 1 2 3 4 5 6`).
 
+### Opus 5.5 mit Effort max
+
 Median-Kosten pro Aufgabe auf Opus 5.5 mit Effort max (USD zum Listenpreis, zwei Seeds):
 
 | Szenario | ohne Plugin | Occam | Ponytail |
@@ -127,43 +143,55 @@ Median-Kosten pro Aufgabe auf Opus 5.5 mit Effort max (USD zum Listenpreis, zwei
 
 Wohin das Geld geht (Summe über 18 Aufgaben, ohne Plugin → Occam): Thinking 8,03 $ → 3,58 $, Cache-Writes 5,23 $ → 2,83 $, sonstiger Output 2,16 $ → 0,88 $, Cache-Reads 1,19 $ → 0,36 $. Die Aufschlüsselung aus den Token-Zählern ergibt die gemeldeten Kosten auf den Cent.
 
-Weitere Runden:
+### Opus 5.5 mit Effort medium
 
-- **Opus 5.5 mit Effort medium** (18 Paare): Occam −11 % [−17 … −5], −27 % Output, −37 % Tool-Output, 18 von 18 bestanden (ohne Plugin 17 von 18, wieder die Refactor-Falle: 77 → 75 Zeilen). Ponytail +11 % [+2 … +20]; Occam gegenüber Ponytail −20 % [−23 … −17]. Bei medium denkt das Modell kaum (Median 186 Thinking-Tokens statt 21,8k), damit fällt der größte Hebel weg, und Cache-Writes machen 58–66 % der Rechnung aus. Die ganze Drei-Arm-Matrix kostete 7,26 $ statt 36 $.
+Gleiches Modell, gleiche Seeds, Szenarien und Messaufbau, mit dem finalen Regelwerk und Ponytail 4.10.0: 54 Sessions, 7,26 $ zum Listenpreis statt 36 $ mit Effort max.
+
+| | Kosten vs. ohne Plugin | Thinking-Tokens | Turns | Tests bestanden |
+|---|---|---|---|---|
+| ohne Plugin | – | 186 | 4 | 17/18 |
+| **Occam** | **−11 %** [−17 … −5] | 138 | 4 | **18/18** |
+| Ponytail 4.10 | +11 % [+2 … +20] | 202 | 4 | 18/18 |
+
+Occam direkt gegen Ponytail: **−20 %** Kosten [−23 … −17]. Occam senkte außerdem den Output um 27 % und den Tool-Output um 37 %. Bei medium denkt das Modell kaum, damit fällt der größte Hebel weg: Cache-Writes machen 58–66 % der Rechnung aus. Ohne Plugin schlug wieder die Refactor-Falle zu (77 → 75 Zeilen). Thinking-Tokens und Turns sind Mediane pro Aufgabe.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/cost-per-scenario-medium-dark.svg">
+  <img alt="Median-Kosten pro Aufgabe auf Claude Opus 5.5 mit Effort medium: Occam ist in acht von neun Szenarien am günstigsten" src="assets/cost-per-scenario-medium-light.svg">
+</picture>
+
+### GPT-6 Astra in Codex
+
+Dieselben neun Szenarien und Seeds liefen auch auf **GPT-6 Astra mit Effort ultra** in Codex CLI 0.153.4 (54 Sessions). Codex kennt keine Claude-Code-Plugins, daher bekam jeder Arm den Regeltext im Modus full als Developer-Instructions. Getestet werden also die Regeln, nicht die Plugin-Hooks. Gesamttokens sind Input + Output über Hauptsession und Subagenten.
+
+| | Gesamttokens vs. ohne Plugin | Reasoning-Tokens | Tool-Calls | Tests bestanden |
+|---|---|---|---|---|
+| ohne Plugin | – | 539 | 9 | 14/18 (16) |
+| **Occam** | **−23 %** [−34 … −10] | 682 | 6 | 16/18 (**18**) |
+| Ponytail 4.10 | +20 % [−2 … +51] | 927 | 10 | 15/18 (17) |
+
+Occam direkt gegen Ponytail: **−36 %** Gesamttokens [−44 … −27], 18 Paare. Reasoning-Tokens und Tool-Calls sind Mediane pro Aufgabe, Tool-Calls nur in der Hauptsession; in Klammern: bestandene Tests nach der dokumentierten Quellenprüfung. Die Laufzeit hat sich nicht verändert (Occam ×1,01 [0,85–1,22]).
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/tokens-per-scenario-astra-dark.svg">
+  <img alt="Median-Gesamttokens pro Aufgabe auf GPT-6 Astra in Codex: Occam braucht in sieben von neun Szenarien die wenigsten" src="assets/tokens-per-scenario-astra-light.svg">
+</picture>
+
+- Der Verifier der question-Aufgabe erwartet `3.500%` und hat alle sechs korrekten Antworten mit `3.5%` abgelehnt. Die Originalurteile bleiben erhalten, die Quellenprüfung steht getrennt daneben.
+- ✗ = nach dieser Prüfung nicht bestanden. Ohne Plugin haben beide Refactor-Läufe das Verhalten erhalten, aber die geforderte Kürzung um 20 % verfehlt (77 → 75 und 76 Zeilen). Ponytail hat in einem Rootcause-Lauf zwei Währungsformate nicht erkannt.
+- Ein abgebrochener Subagent hat bei einem Lauf ohne Plugin unvollständige Tokenzähler hinterlassen. Dieser Lauf fehlt in den Token-Verhältnissen (17 Paare).
+
+[Vollständiger Bericht](bench/results/2026-09-27-astra-ultra.md) · [Daten und Diffs](bench/results/2026-09-27-astra-ultra.jsonl) · [Reproduktion](bench/CODEX.md)
+
+### Weitere Runden
+
 - **Haiku 4.5** (18 Paare): Occam kostenneutral (−2 %, nicht signifikant), −10 % Output, −28 % Tool-Output, 13 statt 10 von 18 bestanden. Ponytail +30 %.
 - **Variante v2** mit zusätzlicher „Verify in proportion“-Regel: ×0,99 [0,89–1,12] gegenüber v1, kein Unterschied. Übernommen wurde nur ihre präzisere Root-Cause-Regel („copied logic“). Sie liegt unter `bench/variants/v2`.
 - **Ungesehener Seed 3** mit dem finalen Regelwerk: −45 % [−54 … −34], Turns 14 → 6, 9 von 9 bestanden (ohne Plugin 8 von 9).
 
-### Andere Modelle und Effort-Stufen
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/change-by-model-dark.svg">
-  <img alt="Veränderung gegenüber ohne Plugin: Occam −51 % Kosten auf Opus 5.5 mit Effort max, −11 % mit Effort medium, −2 % auf Haiku 4.5 und −23 % Tokens auf GPT-6 Astra; Ponytail −26 %, +11 %, +30 % und +20 %" src="assets/change-by-model-light.svg">
-</picture>
-
-Die Claude-Runden vergleichen Kosten, die Codex-Runde Gesamttokens, weil Codex keine Kosten meldet. `python3 bench/chart.py compare assets` zeichnet die Grafik aus den Ergebnisdateien neu.
-
-#### GPT-6 Astra in Codex
-
-Dieselben neun Szenarien und Seeds liefen auch auf **GPT-6 Astra mit Effort ultra** in Codex CLI 0.153.4 (54 Sessions). Codex kennt keine Claude-Code-Plugins, daher bekam jeder Arm den Regeltext im Modus full als Developer-Instructions. Getestet werden also die Regeln, nicht die Plugin-Hooks. Gesamttokens sind Input + Output über Hauptsession und Subagenten.
-
-| GPT-6 Astra, ultra | Tests bestanden | Nach Quellenprüfung | Gesamttokens vs. ohne Plugin | Paare |
-|---|--:|--:|---|--:|
-| ohne Plugin | 14/18 | 16/18 | – | – |
-| **Occam** | 16/18 | **18/18** | **−23 %** [−34 … −10] | 17 |
-| Ponytail 4.10 | 15/18 | 17/18 | +20 % [−2 … +51] | 17 |
-
-Occam direkt gegen Ponytail: **−36 %** Gesamttokens [−44 … −27], 18 Paare. Die Laufzeit hat sich nicht verändert (Occam ×1,01 [0,85–1,22]).
-
-- Der Verifier der question-Aufgabe erwartet `3.500%` und hat alle sechs korrekten Antworten mit `3.5%` abgelehnt. Die Originalurteile bleiben erhalten, die Quellenprüfung steht getrennt daneben.
-- Ohne Plugin haben beide Refactor-Läufe das Verhalten erhalten, aber die geforderte Kürzung um 20 % verfehlt (77 → 75 und 76 Zeilen). Ponytail hat in einem Rootcause-Lauf zwei Währungsformate nicht erkannt.
-- Ein abgebrochener Subagent hat bei einem Lauf ohne Plugin unvollständige Tokenzähler hinterlassen. Dieser Lauf fehlt in den Token-Verhältnissen.
-
-[Vollständiger Bericht](bench/results/2026-09-27-astra-ultra.md) · [Daten und Diffs](bench/results/2026-09-27-astra-ultra.jsonl) · [Reproduktion](bench/CODEX.md)
-
 ### Rohdaten
 
-`bench/results/*.jsonl` enthält eine Zeile pro Session: alle Metriken (Tokens nach Typ, Kosten, Turns, Tool-Calls, Tool-Output-Größe), das Verifier-Ergebnis, die Schlussantwort des Agenten und seinen vollständigen Code-Diff. `python3 bench/bench.py report bench/results/opus-r1.jsonl` erzeugt die Tabellen oben neu. Die vollständigen Session-Transkripte sind nicht veröffentlicht, weil sie kontospezifische Daten enthalten; wer den Benchmark laufen lässt, bekommt seine eigenen. Die Codex-Runde hat ein eigenes Format ohne Kosten; `python3 bench/report_codex.py bench/results/2026-09-27-astra-ultra.jsonl --out /tmp/astra` erzeugt ihren Bericht neu.
+`bench/results/*.jsonl` enthält eine Zeile pro Session: alle Metriken (Tokens nach Typ, Kosten, Turns, Tool-Calls, Tool-Output-Größe), das Verifier-Ergebnis, die Schlussantwort des Agenten und seinen vollständigen Code-Diff. `python3 bench/bench.py report bench/results/opus-r1.jsonl` erzeugt die Tabellen oben neu. Die vollständigen Session-Transkripte sind nicht veröffentlicht, weil sie kontospezifische Daten enthalten; wer den Benchmark laufen lässt, bekommt seine eigenen. Die Codex-Runde hat ein eigenes Format ohne Kosten; `python3 bench/report_codex.py bench/results/2026-09-27-astra-ultra.jsonl --out /tmp/astra` erzeugt ihren Bericht neu. `python3 bench/chart.py assets` zeichnet alle README-Grafiken aus den Ergebnisdateien neu.
 
 ### Selbst laufen lassen
 
