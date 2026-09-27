@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 454" width="760" height="454" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+<text x="0" y="16" font-size="15" font-weight="600" fill="#f0f6fc">Median total tokens per task, GPT-6 Astra (effort ultra) in Codex</text>
+<rect x="0" y="30" width="11" height="11" rx="2" fill="#3987e5"/><text x="17" y="40" font-size="13" fill="#9198a1">Occam</text>
+<rect x="74" y="30" width="11" height="11" rx="2" fill="#d95926"/><text x="91" y="40" font-size="13" fill="#9198a1">Ponytail 4.10</text>
+<rect x="204" y="30" width="11" height="11" rx="2" fill="#199e70"/><text x="221" y="40" font-size="13" fill="#9198a1">no plugin</text>
+<line x1="112.0" x2="112.0" y1="58" y2="428" stroke="#3d444d" stroke-width="1"/><text x="112.0" y="446" font-size="12" text-anchor="middle" fill="#9198a1">0</text>
+<line x1="277.1" x2="277.1" y1="58" y2="428" stroke="#3d444d" stroke-width="1"/><text x="277.1" y="446" font-size="12" text-anchor="middle" fill="#9198a1">200k</text>
+<line x1="442.3" x2="442.3" y1="58" y2="428" stroke="#3d444d" stroke-width="1"/><text x="442.3" y="446" font-size="12" text-anchor="middle" fill="#9198a1">400k</text>
+<line x1="607.4" x2="607.4" y1="58" y2="428" stroke="#3d444d" stroke-width="1"/><text x="607.4" y="446" font-size="12" text-anchor="middle" fill="#9198a1">600k</text>
+<text x="0" y="81" font-size="13" font-weight="600" fill="#f0f6fc">rootcause</text>
+<path d="M112.0,64H303.8Q306.8,64 306.8,67V69Q306.8,72 303.8,72H112.0Z" fill="#3987e5"><title>rootcause, Occam: 236k, tests 2/2</title></path>
+<text x="312.8" y="72" font-size="12" font-weight="600" fill="#f0f6fc">236k</text>
+<path d="M112.0,74H415.3Q418.3,74 418.3,77V79Q418.3,82 415.3,82H112.0Z" fill="#d95926"><title>rootcause, Ponytail 4.10: 371k, tests 1/2</title></path>
+<text x="424.3" y="82" font-size="12" font-weight="600" fill="#e66767">✗ tests failed 1/2</text>
+<path d="M112.0,84H613.6Q616.6,84 616.6,87V89Q616.6,92 613.6,92H112.0Z" fill="#199e70"><title>rootcause, no plugin: 611k, tests 2/2</title></path>
+<text x="0" y="121" font-size="13" font-weight="600" fill="#f0f6fc">feature</text>
+<path d="M112.0,104H298.0Q301.0,104 301.0,107V109Q301.0,112 298.0,112H112.0Z" fill="#3987e5"><title>feature, Occam: 229k, tests 2/2</title></path>
+<text x="307.0" y="112" font-size="12" font-weight="600" fill="#f0f6fc">229k</text>
+<path d="M112.0,114H346.5Q349.5,114 349.5,117V119Q349.5,122 346.5,122H112.0Z" fill="#d95926"><title>feature, Ponytail 4.10: 288k, tests 2/2</title></path>
+<path d="M112.0,124H364.6Q367.6,124 367.6,127V129Q367.6,132 364.6,132H112.0Z" fill="#199e70"><title>feature, no plugin: 310k, tests 2/2</title></path>
+<text x="0" y="161" font-size="13" font-weight="600" fill="#f0f6fc">refactor</text>
+<path d="M112.0,144H230.0Q233.0,144 233.0,147V149Q233.0,152 230.0,152H112.0Z" fill="#3987e5"><title>refactor, Occam: 147k, tests 2/2</title></path>
+<text x="239.0" y="152" font-size="12" font-weight="600" fill="#f0f6fc">147k</text>
+<path d="M112.0,154H341.2Q344.2,154 344.2,157V159Q344.2,162 341.2,162H112.0Z" fill="#d95926"><title>refactor, Ponytail 4.10: 281k, tests 2/2</title></path>
+<path d="M112.0,164H312.5Q315.5,164 315.5,167V169Q315.5,172 312.5,172H112.0Z" fill="#199e70"><title>refactor, no plugin: 246k, tests 0/2</title></path>
+<text x="321.5" y="172" font-size="12" font-weight="600" fill="#e66767">✗ tests failed 2/2</text>
+<text x="0" y="201" font-size="13" font-weight="600" fill="#f0f6fc">fixtures</text>
+<path d="M112.0,184H242.9Q245.9,184 245.9,187V189Q245.9,192 242.9,192H112.0Z" fill="#3987e5"><title>fixtures, Occam: 162k, tests 2/2</title></path>
+<text x="251.9" y="192" font-size="12" font-weight="600" fill="#f0f6fc">162k</text>
+<path d="M112.0,194H304.8Q307.8,194 307.8,197V199Q307.8,202 304.8,202H112.0Z" fill="#d95926"><title>fixtures, Ponytail 4.10: 237k, tests 2/2</title></path>
+<path d="M112.0,204H296.4Q299.4,204 299.4,207V209Q299.4,212 296.4,212H112.0Z" fill="#199e70"><title>fixtures, no plugin: 227k, tests 2/2</title></path>
+<text x="0" y="241" font-size="13" font-weight="600" fill="#f0f6fc">data</text>
+<path d="M112.0,224H255.4Q258.4,224 258.4,227V229Q258.4,232 255.4,232H112.0Z" fill="#3987e5"><title>data, Occam: 177k, tests 2/2</title></path>
+<text x="264.4" y="232" font-size="12" font-weight="600" fill="#f0f6fc">177k</text>
+<path d="M112.0,234H311.9Q314.9,234 314.9,237V239Q314.9,242 311.9,242H112.0Z" fill="#d95926"><title>data, Ponytail 4.10: 246k, tests 2/2</title></path>
+<path d="M112.0,244H290.0Q293.0,244 293.0,247V249Q293.0,252 290.0,252H112.0Z" fill="#199e70"><title>data, no plugin: 219k, tests 2/2</title></path>
+<text x="0" y="281" font-size="13" font-weight="600" fill="#f0f6fc">bigfile</text>
+<path d="M112.0,264H243.9Q246.9,264 246.9,267V269Q246.9,272 243.9,272H112.0Z" fill="#3987e5"><title>bigfile, Occam: 163k, tests 2/2</title></path>
+<text x="252.9" y="272" font-size="12" font-weight="600" fill="#f0f6fc">163k</text>
+<path d="M112.0,274H314.4Q317.4,274 317.4,277V279Q317.4,282 314.4,282H112.0Z" fill="#d95926"><title>bigfile, Ponytail 4.10: 249k, tests 2/2</title></path>
+<path d="M112.0,284H247.6Q250.6,284 250.6,287V289Q250.6,292 247.6,292H112.0Z" fill="#199e70"><title>bigfile, no plugin: 168k, tests 2/2</title></path>
+<text x="0" y="321" font-size="13" font-weight="600" fill="#f0f6fc">security</text>
+<path d="M112.0,304H222.6Q225.6,304 225.6,307V309Q225.6,312 222.6,312H112.0Z" fill="#3987e5"><title>security, Occam: 138k, tests 2/2</title></path>
+<text x="231.6" y="312" font-size="12" font-weight="600" fill="#f0f6fc">138k</text>
+<path d="M112.0,314H298.3Q301.3,314 301.3,317V319Q301.3,322 298.3,322H112.0Z" fill="#d95926"><title>security, Ponytail 4.10: 229k, tests 2/2</title></path>
+<path d="M112.0,324H224.9Q227.9,324 227.9,327V329Q227.9,332 224.9,332H112.0Z" fill="#199e70"><title>security, no plugin: 140k, tests 2/2</title></path>
+<text x="0" y="361" font-size="13" font-weight="600" fill="#f0f6fc">texture</text>
+<path d="M112.0,344H197.4Q200.4,344 200.4,347V349Q200.4,352 197.4,352H112.0Z" fill="#3987e5"><title>texture, Occam: 107k, tests 2/2</title></path>
+<text x="206.4" y="352" font-size="12" font-weight="600" fill="#f0f6fc">107k</text>
+<path d="M112.0,354H348.8Q351.8,354 351.8,357V359Q351.8,362 348.8,362H112.0Z" fill="#d95926"><title>texture, Ponytail 4.10: 290k, tests 2/2</title></path>
+<path d="M112.0,364H192.9Q195.9,364 195.9,367V369Q195.9,372 192.9,372H112.0Z" fill="#199e70"><title>texture, no plugin: 102k, tests 2/2</title></path>
+<text x="0" y="401" font-size="13" font-weight="600" fill="#f0f6fc">question</text>
+<path d="M112.0,384H138.3Q141.3,384 141.3,387V389Q141.3,392 138.3,392H112.0Z" fill="#3987e5"><title>question, Occam: 35k, tests 2/2</title></path>
+<text x="147.3" y="392" font-size="12" font-weight="600" fill="#f0f6fc">35k</text>
+<path d="M112.0,394H140.3Q143.3,394 143.3,397V399Q143.3,402 140.3,402H112.0Z" fill="#d95926"><title>question, Ponytail 4.10: 38k, tests 2/2</title></path>
+<path d="M112.0,404H137.0Q140.0,404 140.0,407V409Q140.0,412 137.0,412H112.0Z" fill="#199e70"><title>question, no plugin: 34k, tests 2/2</title></path>
+</svg>

@@ -1,7 +1,6 @@
 """Render the README charts as light and dark SVG. Stdlib only.
 
-    python3 chart.py results/opus-r1.jsonl ../assets   # median cost per scenario and arm
-    python3 chart.py compare ../assets                 # paired change vs. no plugin, per model
+    python3 chart.py ../assets
 """
 import json, statistics as st, sys
 from pathlib import Path
@@ -24,30 +23,30 @@ def bar(x0, x1, y, h, r=3):  # square at the baseline, rounded data end
     return f'M{x0},{y}H{x1 - r:.1f}Q{x1:.1f},{y} {x1:.1f},{y + r}V{y + h - r}Q{x1:.1f},{y + h} {x1 - r:.1f},{y + h}H{x0}Z'
 
 
-def svg(data, c):
-    W, lw, top, bh, gap, row, xmax = 760, 112, 64, 8, 2, 40, 1.75
+def svg(data, c, title, fmt, tfmt, ticks, xmax):  # median per scenario and arm; fmt labels values, tfmt ticks
+    W, lw, top, bh, gap, row = 760, 112, 64, 8, 2, 40
     names = sorted(data, key=lambda s: -data[s]["baseline"][0])
     H = top + len(names) * row + 30
     sx = lambda v: lw + v / xmax * (W - lw - 70)
     o = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" font-family="{FONT}">',
-         f'<text x="0" y="16" font-size="15" font-weight="600" fill="{c["ink"]}">Median cost per task, Claude Opus 5.5 (effort max), USD at list price</text>']
+         f'<text x="0" y="16" font-size="15" font-weight="600" fill="{c["ink"]}">{title}</text>']
     x = 0
     for a, label in ARMS:
         o.append(f'<rect x="{x}" y="30" width="11" height="11" rx="2" fill="{c[a]}"/>'
                  f'<text x="{x + 17}" y="40" font-size="13" fill="{c["muted"]}">{label}</text>')
         x += 17 + 7 * len(label) + 22
-    for v in (0, 0.5, 1.0, 1.5):
+    for v in ticks:
         o.append(f'<line x1="{sx(v):.1f}" x2="{sx(v):.1f}" y1="{top - 6}" y2="{H - 26}" stroke="{c["grid"]}" stroke-width="1"/>'
-                 f'<text x="{sx(v):.1f}" y="{H - 8}" font-size="12" text-anchor="middle" fill="{c["muted"]}">${v:.2f}</text>')
+                 f'<text x="{sx(v):.1f}" y="{H - 8}" font-size="12" text-anchor="middle" fill="{c["muted"]}">{tfmt(v)}</text>')
     for i, s in enumerate(names):
         y = top + i * row
         o.append(f'<text x="0" y="{y + 17}" font-size="13" font-weight="600" fill="{c["ink"]}">{s}</text>')
         for j, (a, label) in enumerate(ARMS):
             v, passed = data[s][a]
             yy = y + j * (bh + gap)
-            o.append(f'<path d="{bar(sx(0), sx(v), yy, bh)}" fill="{c[a]}"><title>{s}, {label}: ${v:.2f}, tests {passed}/2</title></path>')
+            o.append(f'<path d="{bar(sx(0), sx(v), yy, bh)}" fill="{c[a]}"><title>{s}, {label}: {fmt(v)}, tests {passed}/2</title></path>')
             if a == "occam":
-                o.append(f'<text x="{sx(v) + 6:.1f}" y="{yy + bh}" font-size="12" font-weight="600" fill="{c["ink"]}">${v:.2f}</text>')
+                o.append(f'<text x="{sx(v) + 6:.1f}" y="{yy + bh}" font-size="12" font-weight="600" fill="{c["ink"]}">{fmt(v)}</text>')
             if passed < 2:
                 o.append(f'<text x="{sx(v) + 6:.1f}" y="{yy + bh}" font-size="12" font-weight="600" fill="{c["bad"]}">✗ tests failed {2 - passed}/2</text>')
     return "\n".join(o + ["</svg>"]) + "\n"
@@ -59,6 +58,27 @@ def load(src):
 
 def codex_total(r):  # incomplete usage (interrupted subagent) is excluded, as in report_codex.py
     return r["all_usage"].get("total") if r.get("usage_complete") and r.get("valid_run") else None
+
+
+def reviewed_pass(r):  # the documented source review where one exists, else the verifier
+    return r.get("adjudication", {}).get("reviewed_pass", r["pass"])
+
+
+def usd(v):
+    return f"${v:.2f}"
+
+
+# (file, result file relative to this script, title, value per run, pass per run, value format, tick format, ticks, x max)
+PER_SCENARIO = [
+    ("cost-per-scenario", "results/opus-r1.jsonl", "Median cost per task, Claude Opus 5.5 (effort max), USD at list price",
+     lambda r: r["cost"], lambda r: r["pass"], usd, usd, (0, 0.5, 1.0, 1.5), 1.75),
+    ("cost-per-scenario-medium", "results/opus-medium.jsonl",
+     "Median cost per task, Claude Opus 5.5 (effort medium), USD at list price",
+     lambda r: r["cost"], lambda r: r["pass"], lambda v: f"${v:.3f}", usd, (0, 0.05, 0.1, 0.15, 0.2), 0.25),
+    ("tokens-per-scenario-astra", "results/2026-09-27-astra-ultra.jsonl",
+     "Median total tokens per task, GPT-6 Astra (effort ultra) in Codex", codex_total, reviewed_pass,
+     lambda v: f"{v / 1000:.0f}k", lambda v: f"{v // 1000:.0f}k" if v else "0", (0, 200_000, 400_000, 600_000), 700_000),
+]
 
 
 # (label, metric, result file relative to this script, value per run)
@@ -113,25 +133,27 @@ def compare_svg(data, c):
     return "\n".join(o + ["</svg>"]) + "\n"
 
 
-def compare(out):
+def per_scenario(rows, get, passed):  # {scenario: {arm: (median value, passed runs)}}
+    cells = lambda s, a: [r for r in rows if r["scenario"] == s and r["arm"] == a]
+    return {s: {a: (st.median(v for r in cells(s, a) if (v := get(r)) is not None), sum(passed(r) for r in cells(s, a)))
+                for a, _ in ARMS} for s in sorted({r["scenario"] for r in rows})}
+
+
+def write(out, name, render):
+    Path(out).mkdir(parents=True, exist_ok=True)
+    for theme, colors in THEMES.items():
+        Path(out, f"{name}-{theme}.svg").write_text(render(colors))
+
+
+def main(out):
     here = Path(__file__).parent
-    data = [(label, metric, {a: paired(load(here / src), a, get) for a, _ in ARMS[:2]})
-            for label, metric, src, get in SETUPS]
-    Path(out).mkdir(parents=True, exist_ok=True)
-    for theme, colors in THEMES.items():
-        Path(out, f"change-by-model-{theme}.svg").write_text(compare_svg(data, colors))
-
-
-def main(src, out):
-    rows = load(src)
-    data = {}
-    for s in sorted({r["scenario"] for r in rows}):
-        data[s] = {a: (st.median(r["cost"] for r in rows if r["scenario"] == s and r["arm"] == a),
-                       sum(r["pass"] for r in rows if r["scenario"] == s and r["arm"] == a)) for a, _ in ARMS}
-    Path(out).mkdir(parents=True, exist_ok=True)
-    for theme, colors in THEMES.items():
-        Path(out, f"cost-per-scenario-{theme}.svg").write_text(svg(data, colors))
+    for name, src, title, get, passed, fmt, tfmt, ticks, xmax in PER_SCENARIO:
+        data = per_scenario(load(here / src), get, passed)
+        write(out, name, lambda c: svg(data, c, title, fmt, tfmt, ticks, xmax))
+    rounds = [(label, metric, {a: paired(load(here / src), a, get) for a, _ in ARMS[:2]})
+              for label, metric, src, get in SETUPS]
+    write(out, "change-by-model", lambda c: compare_svg(rounds, c))
 
 
 if __name__ == "__main__":
-    compare(sys.argv[2]) if sys.argv[1] == "compare" else main(*sys.argv[1:3])
+    main(sys.argv[1])
