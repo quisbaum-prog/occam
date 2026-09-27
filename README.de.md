@@ -127,6 +127,7 @@ Wohin das Geld geht (Summe über 18 Aufgaben, ohne Plugin → Occam): Thinking 8
 
 Weitere Runden:
 
+- **Opus 5.5 mit Effort medium** (18 Paare): Occam −11 % [−17 … −5], −27 % Output, −37 % Tool-Output, 18 von 18 bestanden (ohne Plugin 17 von 18, wieder die Refactor-Falle: 77 → 75 Zeilen). Ponytail +11 % [+2 … +21]; Occam gegenüber Ponytail −20 % [−23 … −17]. Bei medium denkt das Modell kaum (Median 186 Thinking-Tokens statt 21,8k), damit fällt der größte Hebel weg, und Cache-Writes machen 58–66 % der Rechnung aus. Die ganze Drei-Arm-Matrix kostete 7,26 $ statt 36 $.
 - **Haiku 4.5** (18 Paare): Occam kostenneutral (−2 %, nicht signifikant), −10 % Output, −28 % Tool-Output, 13 statt 10 von 18 bestanden. Ponytail +30 %.
 - **Variante v2** mit zusätzlicher „Verify in proportion“-Regel: ×0,99 [0,89–1,12] gegenüber v1, kein Unterschied. Übernommen wurde nur ihre präzisere Root-Cause-Regel („copied logic“). Sie liegt unter `bench/variants/v2`.
 - **Ungesehener Seed 3** mit dem finalen Regelwerk: −45 % [−54 … −34], Turns 14 → 6, 9 von 9 bestanden (ohne Plugin 8 von 9).
