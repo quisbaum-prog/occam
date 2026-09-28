@@ -1,8 +1,8 @@
-"""Render the README charts as light and dark SVG. Stdlib only.
+"""Render the README charts as light and dark SVG and print the README overview table. Stdlib only.
 
     python3 chart.py ../assets
 """
-import json, statistics as st, sys
+import json, math, statistics as st, sys
 from pathlib import Path
 
 import bench as B
@@ -45,10 +45,12 @@ def svg(data, c, title, fmt, tfmt, ticks, xmax):  # median per scenario and arm;
             v, passed = data[s][a]
             yy = y + j * (bh + gap)
             o.append(f'<path d="{bar(sx(0), sx(v), yy, bh)}" fill="{c[a]}"><title>{s}, {label}: {fmt(v)}, tests {passed}/2</title></path>')
+            lx = sx(v) + 6
             if a == "occam":
-                o.append(f'<text x="{sx(v) + 6:.1f}" y="{yy + bh}" font-size="12" font-weight="600" fill="{c["ink"]}">{fmt(v)}</text>')
+                o.append(f'<text x="{lx:.1f}" y="{yy + bh}" font-size="12" font-weight="600" fill="{c["ink"]}">{fmt(v)}</text>')
+                lx += 7 * len(fmt(v)) + 6
             if passed < 2:
-                o.append(f'<text x="{sx(v) + 6:.1f}" y="{yy + bh}" font-size="12" font-weight="600" fill="{c["bad"]}">✗ tests failed {2 - passed}/2</text>')
+                o.append(f'<text x="{lx:.1f}" y="{yy + bh}" font-size="12" font-weight="600" fill="{c["bad"]}">✗ tests failed {2 - passed}/2</text>')
     return "\n".join(o + ["</svg>"]) + "\n"
 
 
@@ -75,6 +77,14 @@ PER_SCENARIO = [
     ("cost-per-scenario-medium", "results/opus-medium.jsonl",
      "Median cost per task, Claude Opus 5.5 (effort medium), USD at list price",
      lambda r: r["cost"], lambda r: r["pass"], lambda v: f"${v:.3f}", usd, (0, 0.05, 0.1, 0.15, 0.2), 0.25),
+    ("cost-per-scenario-sonnet-max", "results/sonnet-max.jsonl",
+     "Median cost per task, Claude Sonnet 5.5 (effort max), USD at list price",
+     lambda r: r["cost"], lambda r: r["pass"], usd, usd, (0, 0.25, 0.5, 0.75, 1.0), 1.15),
+    ("cost-per-scenario-sonnet-medium", "results/sonnet-medium.jsonl",
+     "Median cost per task, Claude Sonnet 5.5 (effort medium), USD at list price",
+     lambda r: r["cost"], lambda r: r["pass"], lambda v: f"${v:.3f}", usd, (0, 0.02, 0.04, 0.06, 0.08, 0.1), 0.12),
+    ("cost-per-scenario-haiku", "results/haiku-v1.jsonl", "Median cost per task, Claude Haiku 4.5, USD at list price",
+     lambda r: r["cost"], lambda r: r["pass"], lambda v: f"${v:.3f}", usd, (0, 0.05, 0.1, 0.15, 0.2), 0.25),
     ("tokens-per-scenario-astra", "results/2026-09-27-astra-ultra.jsonl",
      "Median total tokens per task, GPT-6 Astra (effort ultra) in Codex", codex_total, reviewed_pass,
      lambda v: f"{v / 1000:.0f}k", lambda v: f"{v // 1000:.0f}k" if v else "0", (0, 200_000, 400_000, 600_000), 700_000),
@@ -85,17 +95,18 @@ PER_SCENARIO = [
 SETUPS = [
     ("Claude Opus 5.5, effort max", "cost", "results/opus-r1.jsonl", lambda r: r["cost"]),
     ("Claude Opus 5.5, effort medium", "cost", "results/opus-medium.jsonl", lambda r: r["cost"]),
+    ("Claude Sonnet 5.5, effort max", "cost", "results/sonnet-max.jsonl", lambda r: r["cost"]),
+    ("Claude Sonnet 5.5, effort medium", "cost", "results/sonnet-medium.jsonl", lambda r: r["cost"]),
     ("Claude Haiku 4.5", "cost", "results/haiku-v1.jsonl", lambda r: r["cost"]),
     ("GPT-6 Astra in Codex, effort ultra", "total tokens", "results/2026-09-27-astra-ultra.jsonl", codex_total),
 ]
 
 
-def paired(rows, arm, get):
+def paired(rows, arm, get, ref="baseline"):
     by = {}
     for r in rows:
         by.setdefault((r["scenario"], r["seed"], r["rep"]), {})[r["arm"]] = r
-    ratios = [get(g[arm]) / get(g["baseline"]) for g in by.values()
-              if arm in g and "baseline" in g and get(g[arm]) and get(g["baseline"])]
+    ratios = [get(g[arm]) / get(g[ref]) for g in by.values() if arm in g and ref in g and get(g[arm]) and get(g[ref])]
     return (*B.gmean_ci(ratios), len(ratios))
 
 
@@ -103,17 +114,28 @@ def pct(v):  # typographic minus, as in the README
     return f"{v:+.0f}%".replace("-", "\u2212")
 
 
+def change(res):  # paired() result -> "−51% [−58 … −42]"
+    m, l, h = ((v - 1) * 100 for v in res[:3])
+    return f"{pct(m)} [{pct(l)[:-1]} … {pct(h)[:-1]}]"
+
+
 def compare_svg(data, c):
-    W, lw, top, row, lo, hi = 760, 230, 70, 64, -60, 60
     arms = ARMS[:2]
+    ends = [(v - 1) * 100 for _, _, res in data for a, _ in arms for v in res[a][1:3]]
+    W, lw, top, row = 760, 230, 76, 64
+    lo, hi = min(-60, 20 * math.floor(min(ends) / 20)), max(60, 20 * math.ceil(max(ends) / 20))
     H = top + len(data) * row + 34
     sx = lambda pct: lw + (pct - lo) / (hi - lo) * (W - lw - 50)
     o = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" font-family="{FONT}">',
-         f'<text x="0" y="16" font-size="15" font-weight="600" fill="{c["ink"]}">Change vs. no plugin, geometric mean of paired tasks with 95% interval</text>']
+         f'<text x="0" y="16" font-size="15" font-weight="600" fill="{c["ink"]}">Change vs. no plugin, by model and effort</text>',
+         f'<text x="0" y="35" font-size="12" fill="{c["muted"]}">Dot: typical task (geometric mean of paired tasks). '
+         f'Line: 95% interval. Not crossing 0% = a clear difference.</text>',
+         f'<text x="{sx(0) - 8:.1f}" y="{top - 16}" font-size="12" text-anchor="end" fill="{c["muted"]}">← cheaper</text>'
+         f'<text x="{sx(0) + 8:.1f}" y="{top - 16}" font-size="12" fill="{c["muted"]}">more expensive →</text>']
     x = 0
     for a, label in arms:
-        o.append(f'<circle cx="{x + 5}" cy="36" r="5" fill="{c[a]}"/>'
-                 f'<text x="{x + 17}" y="40" font-size="13" fill="{c["muted"]}">{label}</text>')
+        o.append(f'<circle cx="{x + 5}" cy="{top - 20}" r="5" fill="{c[a]}"/>'
+                 f'<text x="{x + 17}" y="{top - 16}" font-size="13" fill="{c["muted"]}">{label}</text>')
         x += 17 + 7 * len(label) + 22
     for v in range(lo, hi + 1, 20):
         o.append(f'<line x1="{sx(v):.1f}" x2="{sx(v):.1f}" y1="{top - 8}" y2="{H - 26}" stroke="{c["grid"]}" '
@@ -124,9 +146,9 @@ def compare_svg(data, c):
         o.append(f'<text x="0" y="{y + 16}" font-size="13" font-weight="600" fill="{c["ink"]}">{label}</text>'
                  f'<text x="0" y="{y + 33}" font-size="12" fill="{c["muted"]}">{metric}, {res["occam"][3]} task pairs</text>')
         for j, (a, name) in enumerate(arms):
-            m, l, h, n = (v if k == 3 else (v - 1) * 100 for k, v in enumerate(res[a]))
+            m, l, h = ((v - 1) * 100 for v in res[a][:3])
             yy = y + 10 + j * 18
-            o.append(f'<g><title>{label}, {name}: {pct(m)} [{pct(l)[:-1]} … {pct(h)[:-1]}], {n} pairs</title>'
+            o.append(f'<g><title>{label}, {name}: {change(res[a])}, {res[a][3]} pairs</title>'
                      f'<line x1="{sx(l):.1f}" x2="{sx(h):.1f}" y1="{yy}" y2="{yy}" stroke="{c[a]}" stroke-width="2"/>'
                      f'<circle cx="{sx(m):.1f}" cy="{yy}" r="5" fill="{c[a]}"/></g>'
                      f'<text x="{sx(h) + 8:.1f}" y="{yy + 4}" font-size="12" font-weight="600" fill="{c["ink"]}">{pct(m)}</text>')
@@ -153,6 +175,15 @@ def main(out):
     rounds = [(label, metric, {a: paired(load(here / src), a, get) for a, _ in ARMS[:2]})
               for label, metric, src, get in SETUPS]
     write(out, "change-by-model", lambda c: compare_svg(rounds, c))
+    print("| Round | Measured | Occam vs. no plugin | Ponytail vs. no plugin | Occam vs. Ponytail | "
+          "Tests passed: no plugin / Occam / Ponytail |\n|---|---|---|---|---|---|")
+    for label, metric, src, get in SETUPS:
+        rows = load(here / src)
+        passed = lambda f: " / ".join(str(sum(f(r) for r in rows if r["arm"] == a)) for a in ("baseline", "occam", "ponytail"))
+        raw, reviewed = passed(lambda r: r["pass"]), passed(reviewed_pass)
+        tests = raw if raw == reviewed else f"{raw} (reviewed: {reviewed})"
+        print(f"| {label} | {metric} | {change(paired(rows, 'occam', get))} | {change(paired(rows, 'ponytail', get))} | "
+              f"{change(paired(rows, 'occam', get, 'ponytail'))} | {tests} |")
 
 
 if __name__ == "__main__":
