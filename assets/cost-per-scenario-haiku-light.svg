@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 454" width="760" height="454" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+<text x="0" y="16" font-size="15" font-weight="600" fill="#1f2328">Median cost per task, Claude Haiku 4.5, USD at list price</text>
+<rect x="0" y="30" width="11" height="11" rx="2" fill="#2a78d6"/><text x="17" y="40" font-size="13" fill="#59636e">Occam</text>
+<rect x="74" y="30" width="11" height="11" rx="2" fill="#eb6834"/><text x="91" y="40" font-size="13" fill="#59636e">Ponytail 4.10</text>
+<rect x="204" y="30" width="11" height="11" rx="2" fill="#1baf7a"/><text x="221" y="40" font-size="13" fill="#59636e">no plugin</text>
+<line x1="112.0" x2="112.0" y1="58" y2="428" stroke="#d1d9e0" stroke-width="1"/><text x="112.0" y="446" font-size="12" text-anchor="middle" fill="#59636e">$0.00</text>
+<line x1="227.6" x2="227.6" y1="58" y2="428" stroke="#d1d9e0" stroke-width="1"/><text x="227.6" y="446" font-size="12" text-anchor="middle" fill="#59636e">$0.05</text>
+<line x1="343.2" x2="343.2" y1="58" y2="428" stroke="#d1d9e0" stroke-width="1"/><text x="343.2" y="446" font-size="12" text-anchor="middle" fill="#59636e">$0.10</text>
+<line x1="458.8" x2="458.8" y1="58" y2="428" stroke="#d1d9e0" stroke-width="1"/><text x="458.8" y="446" font-size="12" text-anchor="middle" fill="#59636e">$0.15</text>
+<line x1="574.4" x2="574.4" y1="58" y2="428" stroke="#d1d9e0" stroke-width="1"/><text x="574.4" y="446" font-size="12" text-anchor="middle" fill="#59636e">$0.20</text>
+<text x="0" y="81" font-size="13" font-weight="600" fill="#1f2328">fixtures</text>
+<path d="M112.0,64H343.0Q346.0,64 346.0,67V69Q346.0,72 343.0,72H112.0Z" fill="#2a78d6"><title>fixtures, Occam: $0.101, tests 1/2</title></path>
+<text x="352.0" y="72" font-size="12" font-weight="600" fill="#1f2328">$0.101</text>
+<text x="400.0" y="72" font-size="12" font-weight="600" fill="#d03b3b">✗ tests failed 1/2</text>
+<path d="M112.0,74H365.7Q368.7,74 368.7,77V79Q368.7,82 365.7,82H112.0Z" fill="#eb6834"><title>fixtures, Ponytail 4.10: $0.111, tests 2/2</title></path>
+<path d="M112.0,84H373.4Q376.4,84 376.4,87V89Q376.4,92 373.4,92H112.0Z" fill="#1baf7a"><title>fixtures, no plugin: $0.114, tests 1/2</title></path>
+<text x="382.4" y="92" font-size="12" font-weight="600" fill="#d03b3b">✗ tests failed 1/2</text>
+<text x="0" y="121" font-size="13" font-weight="600" fill="#1f2328">rootcause</text>
+<path d="M112.0,104H327.1Q330.1,104 330.1,107V109Q330.1,112 327.1,112H112.0Z" fill="#2a78d6"><title>rootcause, Occam: $0.094, tests 1/2</title></path>
+<text x="336.1" y="112" font-size="12" font-weight="600" fill="#1f2328">$0.094</text>
+<text x="384.1" y="112" font-size="12" font-weight="600" fill="#d03b3b">✗ tests failed 1/2</text>
+<path d="M112.0,114H571.8Q574.8,114 574.8,117V119Q574.8,122 571.8,122H112.0Z" fill="#eb6834"><title>rootcause, Ponytail 4.10: $0.200, tests 1/2</title></path>
+<text x="580.8" y="122" font-size="12" font-weight="600" fill="#d03b3b">✗ tests failed 1/2</text>
+<path d="M112.0,124H367.8Q370.8,124 370.8,127V129Q370.8,132 367.8,132H112.0Z" fill="#1baf7a"><title>rootcause, no plugin: $0.112, tests 1/2</title></path>
+<text x="376.8" y="132" font-size="12" font-weight="600" fill="#d03b3b">✗ tests failed 1/2</text>
+<text x="0" y="161" font-size="13" font-weight="600" fill="#1f2328">texture</text>
+<path d="M112.0,144H353.0Q356.0,144 356.0,147V149Q356.0,152 353.0,152H112.0Z" fill="#2a78d6"><title>texture, Occam: $0.106, tests 2/2</title></path>
+<text x="362.0" y="152" font-size="12" font-weight="600" fill="#1f2328">$0.106</text>
+<path d="M112.0,154H293.2Q296.2,154 296.2,157V159Q296.2,162 293.2,162H112.0Z" fill="#eb6834"><title>texture, Ponytail 4.10: $0.080, tests 1/2</title></path>
+<text x="302.2" y="162" font-size="12" font-weight="600" fill="#d03b3b">✗ tests failed 1/2</text>
+<path d="M112.0,164H349.8Q352.8,164 352.8,167V169Q352.8,172 349.8,172H112.0Z" fill="#1baf7a"><title>texture, no plugin: $0.104, tests 2/2</title></path>
+<text x="0" y="201" font-size="13" font-weight="600" fill="#1f2328">feature</text>
+<path d="M112.0,184H301.0Q304.0,184 304.0,187V189Q304.0,192 301.0,192H112.0Z" fill="#2a78d6"><title>feature, Occam: $0.083, tests 1/2</title></path>
+<text x="310.0" y="192" font-size="12" font-weight="600" fill="#1f2328">$0.083</text>
+<text x="358.0" y="192" font-size="12" font-weight="600" fill="#d03b3b">✗ tests failed 1/2</text>
+<path d="M112.0,194H290.7Q293.7,194 293.7,197V199Q293.7,202 290.7,202H112.0Z" fill="#eb6834"><title>feature, Ponytail 4.10: $0.079, tests 0/2</title></path>
+<text x="299.7" y="202" font-size="12" font-weight="600" fill="#d03b3b">✗ tests failed 2/2</text>
+<path d="M112.0,204H292.0Q295.0,204 295.0,207V209Q295.0,212 292.0,212H112.0Z" fill="#1baf7a"><title>feature, no plugin: $0.079, tests 1/2</title></path>
+<text x="301.0" y="212" font-size="12" font-weight="600" fill="#d03b3b">✗ tests failed 1/2</text>
+<text x="0" y="241" font-size="13" font-weight="600" fill="#1f2328">bigfile</text>
+<path d="M112.0,224H268.6Q271.6,224 271.6,227V229Q271.6,232 268.6,232H112.0Z" fill="#2a78d6"><title>bigfile, Occam: $0.069, tests 2/2</title></path>
+<text x="277.6" y="232" font-size="12" font-weight="600" fill="#1f2328">$0.069</text>
+<path d="M112.0,234H388.8Q391.8,234 391.8,237V239Q391.8,242 388.8,242H112.0Z" fill="#eb6834"><title>bigfile, Ponytail 4.10: $0.121, tests 2/2</title></path>
+<path d="M112.0,244H258.4Q261.4,244 261.4,247V249Q261.4,252 258.4,252H112.0Z" fill="#1baf7a"><title>bigfile, no plugin: $0.065, tests 2/2</title></path>
+<text x="0" y="281" font-size="13" font-weight="600" fill="#1f2328">refactor</text>
+<path d="M112.0,264H215.1Q218.1,264 218.1,267V269Q218.1,272 215.1,272H112.0Z" fill="#2a78d6"><title>refactor, Occam: $0.046, tests 0/2</title></path>
+<text x="224.1" y="272" font-size="12" font-weight="600" fill="#1f2328">$0.046</text>
+<text x="272.1" y="272" font-size="12" font-weight="600" fill="#d03b3b">✗ tests failed 2/2</text>
+<path d="M112.0,274H232.9Q235.9,274 235.9,277V279Q235.9,282 232.9,282H112.0Z" fill="#eb6834"><title>refactor, Ponytail 4.10: $0.054, tests 0/2</title></path>
+<text x="241.9" y="282" font-size="12" font-weight="600" fill="#d03b3b">✗ tests failed 2/2</text>
+<path d="M112.0,284H199.1Q202.1,284 202.1,287V289Q202.1,292 199.1,292H112.0Z" fill="#1baf7a"><title>refactor, no plugin: $0.039, tests 0/2</title></path>
+<text x="208.1" y="292" font-size="12" font-weight="600" fill="#d03b3b">✗ tests failed 2/2</text>
+<text x="0" y="321" font-size="13" font-weight="600" fill="#1f2328">security</text>
+<path d="M112.0,304H181.1Q184.1,304 184.1,307V309Q184.1,312 181.1,312H112.0Z" fill="#2a78d6"><title>security, Occam: $0.031, tests 2/2</title></path>
+<text x="190.1" y="312" font-size="12" font-weight="600" fill="#1f2328">$0.031</text>
+<path d="M112.0,314H209.3Q212.3,314 212.3,317V319Q212.3,322 209.3,322H112.0Z" fill="#eb6834"><title>security, Ponytail 4.10: $0.043, tests 2/2</title></path>
+<path d="M112.0,324H197.7Q200.7,324 200.7,327V329Q200.7,332 197.7,332H112.0Z" fill="#1baf7a"><title>security, no plugin: $0.038, tests 1/2</title></path>
+<text x="206.7" y="332" font-size="12" font-weight="600" fill="#d03b3b">✗ tests failed 1/2</text>
+<text x="0" y="361" font-size="13" font-weight="600" fill="#1f2328">data</text>
+<path d="M112.0,344H193.4Q196.4,344 196.4,347V349Q196.4,352 193.4,352H112.0Z" fill="#2a78d6"><title>data, Occam: $0.037, tests 2/2</title></path>
+<text x="202.4" y="352" font-size="12" font-weight="600" fill="#1f2328">$0.037</text>
+<path d="M112.0,354H274.8Q277.8,354 277.8,357V359Q277.8,362 274.8,362H112.0Z" fill="#eb6834"><title>data, Ponytail 4.10: $0.072, tests 0/2</title></path>
+<text x="283.8" y="362" font-size="12" font-weight="600" fill="#d03b3b">✗ tests failed 2/2</text>
+<path d="M112.0,364H196.2Q199.2,364 199.2,367V369Q199.2,372 196.2,372H112.0Z" fill="#1baf7a"><title>data, no plugin: $0.038, tests 0/2</title></path>
+<text x="205.2" y="372" font-size="12" font-weight="600" fill="#d03b3b">✗ tests failed 2/2</text>
+<text x="0" y="401" font-size="13" font-weight="600" fill="#1f2328">question</text>
+<path d="M112.0,384H168.6Q171.6,384 171.6,387V389Q171.6,392 168.6,392H112.0Z" fill="#2a78d6"><title>question, Occam: $0.026, tests 2/2</title></path>
+<text x="177.6" y="392" font-size="12" font-weight="600" fill="#1f2328">$0.026</text>
+<path d="M112.0,394H189.3Q192.3,394 192.3,397V399Q192.3,402 189.3,402H112.0Z" fill="#eb6834"><title>question, Ponytail 4.10: $0.035, tests 2/2</title></path>
+<path d="M112.0,404H165.6Q168.6,404 168.6,407V409Q168.6,412 165.6,412H112.0Z" fill="#1baf7a"><title>question, no plugin: $0.024, tests 2/2</title></path>
+</svg>

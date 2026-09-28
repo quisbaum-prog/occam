@@ -3,6 +3,7 @@
     python3 bench.py run --model sonnet --arms baseline,occam=../plugin,ponytail=/path/to/ponytail \
                          --seeds 1 2 --jobs 4 --out runs/sonnet
     python3 bench.py report runs/sonnet [more dirs...]
+    python3 bench.py export runs/sonnet results/sonnet.jsonl
 
 Every run is a real headless Claude Code session in a fresh workspace, with a fresh HOME/config dir and a
 clean venv, so nothing leaks between arms: `baseline` loads no plugin, every other arm exactly one (--plugin-dir).
@@ -145,6 +146,14 @@ def cmd_rescore(args):
         print(f"{r['scenario']:9} s{r['seed']} {r['arm']:10} {'PASS' if v['pass'] else 'fail'} {v['score']} {v['notes'][:120]}")
 
 
+def cmd_export(args):
+    """One JSON line per session (result plus code diff), the format of results/*.jsonl."""
+    rows = [{**json.loads(rf.read_text()), "diff": (rf.parent / "diff.patch").read_text()}
+            for rf in Path(args.dir).glob("*/result.json")]
+    rows.sort(key=lambda r: (r["scenario"], r["seed"], r["arm"], r["rep"]))
+    Path(args.out).write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows), encoding="utf-8")
+
+
 def cmd_run(args):
     arms = []
     for a in args.arms.split(","):
@@ -217,7 +226,7 @@ def cmd_report(args):
         print(f"  {a:12} " + "  ".join(f"{k}={v:.0%}" for k, v in out["arms"][a]["shares"].items()))
     print("\nPaired vs baseline (geometric mean of per-task ratios, 95% bootstrap CI; <1 = cheaper):")
     for a in arms[1:]:
-        pairs = [g for g in by.values() if "baseline" in g and a in g]
+        pairs = [by[k] for k in sorted(by) if "baseline" in by[k] and a in by[k]]  # fixed order: same CI from runs/ or results/
         out["paired"][a] = {"pairs": len(pairs)}
         line = f"  {a:12} pairs={len(pairs):3}"
         for k in ("cost", "output", "cache_read", "turns", "tool_result_chars"):
@@ -265,8 +274,11 @@ def main():
     p.add_argument("dirs", nargs="+")
     p.add_argument("--json")
     sub.add_parser("rescore").add_argument("dir")
+    e = sub.add_parser("export")
+    e.add_argument("dir")
+    e.add_argument("out")
     a = ap.parse_args()
-    {"run": cmd_run, "report": cmd_report, "rescore": cmd_rescore}[a.cmd](a)
+    {"run": cmd_run, "report": cmd_report, "rescore": cmd_rescore, "export": cmd_export}[a.cmd](a)
 
 
 if __name__ == "__main__":
