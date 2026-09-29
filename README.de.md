@@ -14,7 +14,7 @@ Ein Prompt, drei frische Docker-Container. Jede Variante erstellt eine einzelne 
 
 **Base → Occam → Ponytail 4.10**, von links nach rechts. Zehn Sekunden mit 30 Bildern/s, derselbe Browser, dieselbe Auflösung, Software-Grafik und Animationsuhr.
 
-[![Black-hole comparison](assets/black-hole/sol61-max-fast.png)](assets/black-hole/sol61-max-fast.mp4)
+https://github.com/user-attachments/assets/e4cbba37-8562-4835-a1bf-18c8d86d133d
 
 [Originalvideo abspielen/herunterladen](assets/black-hole/sol61-max-fast.mp4) · [Standbild bei fünf Sekunden](assets/black-hole/sol61-max-fast.png)
 

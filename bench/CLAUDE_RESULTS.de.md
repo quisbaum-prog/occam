@@ -200,4 +200,3 @@ Eine Sonnet-5.5-Session mit Effort max kostet zum Listenpreis etwa 0,05–1,10 $
 - Neun Szenarien, überwiegend Python. Diese Runden enthalten keine Frontend-Aufgabe. Der separate Schwarzes-Loch-Pilot steht unter [black-hole/](black-hole/README.md).
 - Zwei Seeds pro Runde, ein Lauf pro Aufgabe: 18 Paare. Kleine Effekte von wenigen Prozent gehen im Rauschen unter.
 - Kosten sind Listenpreis-Schätzungen aus den Session-Metadaten.
-

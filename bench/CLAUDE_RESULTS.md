@@ -200,4 +200,3 @@ One Sonnet 5.5 session at effort max costs about $0.05–1.10 at list price, the
 - Nine scenarios, mostly Python. These coding rounds contain no frontend task. The separate black-hole pilot is documented in [black-hole/](black-hole/README.md).
 - Two seeds per round, one run per task: 18 pairs. Small effects (a few percent) are within the noise.
 - Costs are list-price estimates from session metadata.
-

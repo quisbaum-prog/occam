@@ -14,7 +14,7 @@ One prompt, three fresh Docker containers. Each setup creates one offline HTML a
 
 **Base → Occam → Ponytail 4.10**, left to right. Ten seconds at 30 fps; the same browser, viewport, software renderer, and animation clock.
 
-[![Black-hole comparison](assets/black-hole/sol61-max-fast.png)](assets/black-hole/sol61-max-fast.mp4)
+https://github.com/user-attachments/assets/e4cbba37-8562-4835-a1bf-18c8d86d133d
 
 [Watch/download the original MP4](assets/black-hole/sol61-max-fast.mp4) · [Still image at 5 seconds](assets/black-hole/sol61-max-fast.png)
 
