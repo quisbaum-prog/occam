@@ -1,0 +1,29 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Capture pipeline reference — no model output</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#030309;color:#f4dfbb;font:14px system-ui;overflow:hidden}
+canvas{display:block;width:100vw;height:100vh}nav{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);display:flex;gap:12px}
+button{font:inherit;color:inherit;background:#15131b;border:1px solid #6b5431;border-radius:8px;padding:10px 18px}
+</style>
+<canvas id="scene" width="1280" height="800"></canvas>
+<nav><button id="pause">Pause</button><button id="restart">Restart</button></nav>
+<script>
+const canvas=document.getElementById('scene'),ctx=canvas.getContext('2d');
+let phase=0,paused=false,last=performance.now();
+function draw(){
+  ctx.fillStyle='#030309';ctx.fillRect(0,0,1280,800);
+  ctx.save();ctx.translate(640,400);
+  ctx.shadowColor='#e79428';ctx.shadowBlur=30;ctx.strokeStyle='#eeb05b';ctx.lineWidth=12;
+  ctx.beginPath();ctx.ellipse(0,0,330,28,0,0,Math.PI*2);ctx.stroke();
+  ctx.lineWidth=6;ctx.beginPath();ctx.arc(0,0,160,Math.PI,Math.PI*2);ctx.stroke();
+  ctx.beginPath();ctx.arc(0,0,160,0,Math.PI);ctx.stroke();
+  ctx.shadowBlur=0;ctx.fillStyle='#000';ctx.beginPath();ctx.arc(0,0,120,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#fff2c5';ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,0,122,0,Math.PI*2);ctx.stroke();
+  ctx.rotate(phase);ctx.lineWidth=16;ctx.strokeStyle='#fff0b0';ctx.beginPath();ctx.arc(0,0,142,0,1.4);ctx.stroke();ctx.restore();
+}
+function tick(now){if(!paused)phase+=(now-last)/1000*0.7;last=now;draw();requestAnimationFrame(tick)}
+document.getElementById('pause').onclick=()=>{paused=!paused;last=performance.now();document.getElementById('pause').textContent=paused?'Resume':'Pause'};
+document.getElementById('restart').onclick=()=>{phase=0;paused=false;last=performance.now();document.getElementById('pause').textContent='Pause';draw()};
+draw();requestAnimationFrame(tick);
+</script>

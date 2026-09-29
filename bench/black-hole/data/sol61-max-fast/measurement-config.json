@@ -1,0 +1,20 @@
+{
+  "benchmark_id": "gargantua-offline-v1",
+  "arms": ["base", "occam", "ponytail"],
+  "models": [
+    {"id": "gpt-6.1-sol", "effort": "medium"},
+    {"id": "gpt-6.1-sol", "effort": "ultra"}
+  ],
+  "repetitions": 3,
+  "schedule_seed": 20260929,
+  "timeout_s": 1800,
+  "cpus": 2,
+  "memory": "4g",
+  "pids_limit": 256,
+  "codex_version": "0.159.0",
+  "viewport": {"width": 1280, "height": 800},
+  "capture": {"seconds": 10, "fps": 30, "screenshot_second": 5},
+  "renderer_version": "1.63.0",
+  "delegation": false,
+  "comparison": "full-mode-rule-text"
+}

@@ -1,2 +1,8 @@
 bench/runs/
 __pycache__/
+
+# Private Docker benchmark runs and machine-specific state
+bench/black-hole/runs/
+bench/black-hole/runtime-lock.json
+bench/black-hole/SETUP-STATUS.json
+bench/black-hole/SMOKE-TEST.json

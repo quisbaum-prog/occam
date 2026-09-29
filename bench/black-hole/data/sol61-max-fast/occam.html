@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#050505">
+  <title>Gargantua · A study in gravity</title>
+  <style>
+    :root { color-scheme: dark; font-family: Arial, Helvetica, sans-serif; }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #030304; }
+    canvas { position: fixed; inset: 0; z-index: 0; width: 100%; height: 100%; display: block; }
+    .frame { position: fixed; inset: 0; z-index: 1; padding: 35px 42px 30px; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; }
+    header, footer { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .eyebrow { margin: 0 0 10px; font-size: 9px; letter-spacing: .28em; color: #a18b6f; }
+    h1 { margin: 0; font-family: Georgia, 'Times New Roman', serif; font-weight: 400; font-size: 27px; letter-spacing: .13em; color: #eee7dc; }
+    .status { display: flex; align-items: center; gap: 9px; font-size: 9px; letter-spacing: .2em; color: #afa496; }
+    .status::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: #f7c17e; box-shadow: 0 0 9px #d4894f; }
+    body[data-paused="true"] .status::before { background: #736d65; box-shadow: none; }
+    footer { border-top: 1px solid #e5c3931a; padding-top: 20px; }
+    .caption { margin: 0; color: #b4a899; font-family: Georgia, 'Times New Roman', serif; font-size: 14px; letter-spacing: .025em; }
+    .subcaption { margin: 7px 0 0; font-size: 9px; letter-spacing: .15em; color: #716b63; }
+    .controls { display: flex; align-items: center; gap: 10px; pointer-events: auto; }
+    button { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-width: 104px; min-height: 42px; padding: 11px 16px; border: 1px solid #ab968644; border-radius: 5px; background: #11100ebf; color: #d8cbbb; font: 11px Arial, Helvetica, sans-serif; letter-spacing: .035em; cursor: pointer; transition: background .18s, border-color .18s; }
+    button:hover { background: #2b231c; border-color: #a68d68; }
+    button:focus-visible { outline: 2px solid #ffcf8b; outline-offset: 4px; }
+    button svg { width: 13px; height: 13px; fill: currentColor; flex-shrink: 0; }
+    .play-icon { display: none; }
+    body[data-paused="true"] .pause-icon { display: none; }
+    body[data-paused="true"] .play-icon { display: block; }
+    @media (max-width: 600px) {
+      .frame { padding: 25px 22px 22px; }
+      h1 { font-size: 21px; }
+      header { align-items: flex-start; }
+      .status { margin-top: 3px; font-size: 8px; }
+      footer { align-items: flex-end; gap: 12px; }
+      .caption { font-size: 12px; }
+      .subcaption { max-width: 160px; font-size: 8px; line-height: 1.7; }
+      .controls { gap: 7px; }
+      button { min-width: 0; padding: 11px; font-size: 10px; }
+    }
+    @media (max-height: 450px) {
+      .frame { padding: 18px 25px; }
+      .eyebrow, .subcaption { display: none; }
+      h1 { font-size: 20px; }
+      footer { padding-top: 12px; }
+    }
+  </style>
+</head>
+<body data-paused="false">
+  <canvas id="universe" role="img" aria-label="A circular black hole surrounded by a rotating, white-gold and orange accretion disk, with light bending above and below its shadow."></canvas>
+  <main class="frame">
+    <header>
+      <div><p class="eyebrow">A STUDY IN GRAVITY</p><h1>Gargantua</h1></div>
+      <div class="status" id="status" role="status">LIVE OBSERVATION</div>
+    </header>
+    <footer>
+      <div><p class="caption">Beyond the event horizon.</p><p class="subcaption">INSPIRED BY INTERSTELLAR · FIXED OBSERVER</p></div>
+      <div class="controls" aria-label="Animation controls">
+        <button id="pause" type="button" aria-pressed="false" aria-keyshortcuts="Space" title="Pause animation (Space)">
+          <svg class="pause-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 3h3v10H4zm5 0h3v10H9z"/></svg>
+          <svg class="play-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5 13 8l-9 5.5z"/></svg>
+          <span id="pause-label">Pause</span>
+        </button>
+        <button id="restart" type="button" aria-keyshortcuts="R" title="Restart animation (R)">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2a6 6 0 1 1-5.7 7.8l1.4-.5A4.5 4.5 0 1 0 5 4.7L7 7H1V1l2.9 2.6A6 6 0 0 1 8 2z"/></svg>
+          <span>Restart</span>
+        </button>
+      </div>
+    </footer>
+  </main>
+  <script>
+  (() => {
+    'use strict';
+    let canvas = document.getElementById('universe');
+    const pauseButton = document.getElementById('pause');
+    const pauseLabel = document.getElementById('pause-label');
+    const status = document.getElementById('status');
+    let render, resizeRenderer;
+    let elapsed = 0, lastFrame = null, animationFrame = 0, paused = false;
+
+    // A thin disk is projected through a radial lens map. Its texture is evaluated
+    // in the rotating disk's coordinates, so the observer never moves.
+    const fragmentSource = `
+      precision highp float;
+      uniform vec2 resolution;
+      uniform float time;
+
+      float hash(vec2 p) {
+        vec3 q = fract(vec3(p.xyx) * .1031);
+        q += dot(q, q.yzx + 33.33);
+        return fract((q.x + q.y) * q.z);
+      }
+      float noise(vec2 p) {
+        vec2 i = floor(p), f = fract(p);
+        f = f * f * (3.0 - 2.0 * f);
+        return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x),
+                   mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), f.x), f.y);
+      }
+      vec3 disk(vec2 p, float detailed) {
+        float r2 = dot(p, p);
+        if (r2 < .96) return vec3(0);
+        float bend = 1.0 - 1.0 / r2;
+        vec2 plane = vec2(p.x * bend, (p.y * bend - .175 / r2) / .085);
+        float radius = length(plane);
+        if (radius < 1.18 || radius > 5.25) return vec3(0);
+        float angle = atan(plane.y, plane.x);
+        float phase = angle - time * .46 * pow(2.0 / radius, 1.5);
+        float texture = .75;
+        if (detailed > .5) {
+          vec2 orbit = vec2(cos(phase), sin(phase)) * radius;
+          float turbulence = .57 * noise(orbit * 8.0)
+                           + .28 * noise(orbit * 23.0)
+                           + .15 * noise(orbit * 61.0);
+          float threads = .5 + .5 * sin(radius * 112.0 + turbulence * 13.0);
+          float spiral = pow(.5 + .5 * cos(phase * 3.0 + radius * 3.7), 14.0);
+          float fragments = pow(.5 + .5 * sin(phase * 11.0 - radius * 7.0 + turbulence * 4.0), 4.0);
+          texture = (.12 + turbulence * .65) * (.24 + .76 * threads * threads)
+                  + 2.9 * spiral * (.4 + .6 * turbulence) + .18 * fragments;
+        }
+        float edges = smoothstep(1.18, 1.42, radius) * (1.0 - smoothstep(3.6, 5.25, radius));
+        float beaming = 1.0 + .38 * plane.x / radius;
+        float intensity = 3.4 * pow(1.35 / radius, 1.65) * edges * texture * beaming;
+        float warmth = smoothstep(1.3, 4.8, radius);
+        vec3 color = mix(vec3(1.0, .86, .63), vec3(1.0, .27, .035), warmth);
+        return color * intensity;
+      }
+      vec3 stars(vec2 uv) {
+        vec2 grid = uv * 43.0;
+        vec2 cell = floor(grid);
+        float seed = hash(cell + 71.0);
+        vec2 point = vec2(hash(cell + 3.2), hash(cell + 9.7));
+        float distance = length(fract(grid) - point);
+        float size = .013 + .017 * hash(cell + 13.0);
+        float star = exp(-distance * distance / (size * size));
+        star *= step(.981, seed) * (.12 + .65 * hash(cell + 29.0));
+        return mix(vec3(.65, .74, .9), vec3(1.0, .78, .52), seed) * star;
+      }
+      vec3 tonemap(vec3 c) {
+        return clamp((c * (2.51 * c + .03)) / (c * (2.43 * c + .59) + .14), 0.0, 1.0);
+      }
+      void main() {
+        vec2 uv = (gl_FragCoord.xy - .5 * resolution) / resolution.y;
+        vec2 p = uv / .15; // Shadow diameter = 30% of the viewport height.
+        float r = length(p);
+        float pixel = 1.0 / (.15 * resolution.y);
+        vec3 color = vec3(.00025, .00029, .0004) + stars(uv);
+
+        // Broad scattered light, then the smaller bloom around each disk image.
+        float haze = exp(-pow(p.y / (.14 + .032 * abs(p.x)), 2.0))
+                   * exp(-pow(abs(p.x) / 4.8, 4.0));
+        float halo = exp(-pow((r - 1.09) / .24, 2.0));
+        color += vec3(.07, .026, .007) * haze;
+        color += vec3(.024, .011, .004) * halo;
+        color += disk(p + vec2(0, .035), 0.0) * .06;
+        color += disk(p - vec2(0, .035), 0.0) * .06;
+        color += disk(p + vec2(.035, 0), 0.0) * .035;
+        color += disk(p - vec2(.035, 0), 0.0) * .035;
+        color += disk(p + vec2(0, .12), 0.0) * .02;
+        color += disk(p - vec2(0, .12), 0.0) * .02;
+        color += disk(p, 1.0);
+
+        // An unresolved higher-order image forms the fine photon ring.
+        float rim = exp(-pow((r - 1.012) / max(.005, pixel * .65), 2.0));
+        float rimGlow = exp(-abs(r - 1.017) * 52.0);
+        float rimTexture = .83 + .17 * sin(atan(p.y, p.x) * 19.0 - time * .7);
+        color += vec3(1.0, .82, .53) * (rim * 1.75 + rimGlow * .2) * rimTexture;
+        color *= 1.0 - .22 * smoothstep(2.8, 5.6, length(p * vec2(.65, 1.0)));
+        color = pow(tonemap(color * 1.12), vec3(1.0 / 2.2));
+        float grain = (hash(gl_FragCoord.xy) - .5) * .014;
+        color += grain * sqrt(max(color, vec3(0)));
+        // Mask after bloom: the shadow stays truly black and perfectly circular.
+        color *= smoothstep(1.0 - pixel * .55, 1.0 + pixel * .55, r);
+        gl_FragColor = vec4(max(color, vec3(0)), 1);
+      }
+    `;
+
+    function createWebGLRenderer() {
+      const gl = canvas.getContext('webgl', { alpha: false, antialias: false, depth: false, stencil: false, preserveDrawingBuffer: false });
+      if (!gl) return false;
+      function compile(type, source) {
+        const shader = gl.createShader(type);
+        gl.shaderSource(shader, source);
+        gl.compileShader(shader);
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+          gl.deleteShader(shader);
+          throw new Error('Shader compilation failed');
+        }
+        return shader;
+      }
+      const vertex = compile(gl.VERTEX_SHADER, 'attribute vec2 position; void main() { gl_Position = vec4(position, 0, 1); }');
+      const fragment = compile(gl.FRAGMENT_SHADER, fragmentSource);
+      const program = gl.createProgram();
+      gl.attachShader(program, vertex);
+      gl.attachShader(program, fragment);
+      gl.linkProgram(program);
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error('Shader linking failed');
+      gl.useProgram(program);
+      gl.deleteShader(vertex);
+      gl.deleteShader(fragment);
+      const buffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+      const position = gl.getAttribLocation(program, 'position');
+      gl.enableVertexAttribArray(position);
+      gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
+      const resolution = gl.getUniformLocation(program, 'resolution');
+      const time = gl.getUniformLocation(program, 'time');
+      resizeRenderer = () => {
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        gl.uniform2f(resolution, canvas.width, canvas.height);
+      };
+      render = seconds => {
+        gl.uniform1f(time, seconds);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+      };
+      canvas.addEventListener('webglcontextlost', event => {
+        event.preventDefault();
+        cancelAnimationFrame(animationFrame);
+        useCanvasRenderer();
+        resize();
+        schedule();
+      }, { once: true });
+      return true;
+    }
+
+    // A deterministic software renderer also works when WebGL is unavailable.
+    function useCanvasRenderer() {
+      const replacement = canvas.cloneNode(false);
+      canvas.replaceWith(replacement);
+      canvas = replacement;
+      const ctx = canvas.getContext('2d', { alpha: false });
+      resizeRenderer = () => {};
+      const random = n => {
+        const x = Math.sin(n * 127.1 + 311.7) * 43758.5453;
+        return x - Math.floor(x);
+      };
+      render = seconds => {
+        const w = canvas.width, h = canvas.height, radius = h * .15;
+        ctx.fillStyle = '#030304';
+        ctx.fillRect(0, 0, w, h);
+        for (let i = 0; i < 85; i++) {
+          ctx.fillStyle = `rgba(225,214,193,${.12 + random(i + 9) * .48})`;
+          ctx.fillRect(random(i + 1) * w, random(i + 201) * h, Math.max(1, radius / 130), Math.max(1, radius / 130));
+        }
+        ctx.save();
+        ctx.translate(w / 2, h / 2);
+        ctx.globalCompositeOperation = 'screen';
+        const glow = ctx.createRadialGradient(0, 0, radius * .95, 0, 0, radius * 2);
+        glow.addColorStop(0, '#a1542822'); glow.addColorStop(.3, '#7b35151c'); glow.addColorStop(1, '#00000000');
+        ctx.fillStyle = glow;
+        ctx.fillRect(-radius * 2, -radius * 2, radius * 4, radius * 4);
+        for (let i = 90; i >= 0; i--) {
+          const ring = 1.3 + i / 90 * 3.9;
+          const hot = 1 - i / 90;
+          const phase = seconds * .46 * Math.pow(2 / ring, 1.5);
+          ctx.lineWidth = radius * (.007 + .007 * random(i + 600));
+          ctx.strokeStyle = `rgba(255,${Math.round(85 + hot * 150)},${Math.round(22 + hot * 152)},${.13 + hot * .5})`;
+          ctx.shadowColor = '#ffac53'; ctx.shadowBlur = radius * .035;
+          ctx.beginPath();
+          ctx.ellipse(0, radius * .02, ring * radius, ring * radius * .085, 0, 0, Math.PI * 2);
+          ctx.stroke();
+          for (let j = 0; j < 3; j++) {
+            const angle = phase + j * Math.PI * 2 / 3 - ring * 1.23;
+            ctx.strokeStyle = `rgba(255,235,185,${.22 + hot * .45})`;
+            ctx.beginPath();
+            ctx.ellipse(0, radius * .02, ring * radius, ring * radius * .085, 0, angle, angle + .18 + random(i + 800) * .18);
+            ctx.stroke();
+          }
+        }
+        for (let i = 42; i >= 0; i--) {
+          const f = i / 42;
+          ctx.lineWidth = radius * .008;
+          ctx.strokeStyle = `rgba(255,${Math.round(215 - f * 100)},${Math.round(153 - f * 120)},${.55 * (1 - f) + .035})`;
+          ctx.shadowColor = '#ffbb6e'; ctx.shadowBlur = radius * .028;
+          ctx.beginPath();
+          ctx.ellipse(0, 0, radius * (1.02 + f * .42), radius * (1.06 + f * .26), 0, Math.PI, Math.PI * 2);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.ellipse(0, 0, radius * (1.015 + f * .25), radius * (1.025 + f * .085), 0, 0, Math.PI);
+          ctx.stroke();
+        }
+        ctx.lineWidth = Math.max(1, radius * .007);
+        ctx.strokeStyle = '#ffe5b0'; ctx.shadowColor = '#ffc476'; ctx.shadowBlur = radius * .045;
+        ctx.beginPath(); ctx.arc(0, 0, radius * 1.012, 0, Math.PI * 2); ctx.stroke();
+        ctx.shadowBlur = 0; ctx.globalCompositeOperation = 'source-over'; ctx.fillStyle = '#000';
+        ctx.beginPath(); ctx.arc(0, 0, radius, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+      };
+    }
+
+    function resize() {
+      const scale = Math.min(window.devicePixelRatio || 1, 1.5, Math.sqrt(2100000 / (innerWidth * innerHeight)));
+      canvas.width = Math.max(1, Math.round(innerWidth * scale));
+      canvas.height = Math.max(1, Math.round(innerHeight * scale));
+      resizeRenderer();
+      render(elapsed);
+    }
+    function schedule() {
+      if (!paused && !document.hidden) animationFrame = requestAnimationFrame(tick);
+    }
+    function tick(stamp) {
+      if (lastFrame !== null) elapsed += (stamp - lastFrame) / 1000;
+      lastFrame = stamp;
+      render(elapsed);
+      schedule();
+    }
+    function updateControls() {
+      document.body.dataset.paused = String(paused);
+      pauseButton.setAttribute('aria-pressed', String(paused));
+      pauseLabel.textContent = paused ? 'Resume' : 'Pause';
+      pauseButton.title = `${paused ? 'Resume' : 'Pause'} animation (Space)`;
+      status.textContent = paused ? 'OBSERVATION PAUSED' : 'LIVE OBSERVATION';
+    }
+    function togglePause() {
+      paused = !paused;
+      cancelAnimationFrame(animationFrame);
+      lastFrame = null;
+      updateControls();
+      schedule();
+    }
+    function restart() {
+      cancelAnimationFrame(animationFrame);
+      elapsed = 0;
+      lastFrame = null;
+      paused = false;
+      updateControls();
+      render(0);
+      schedule();
+    }
+    pauseButton.addEventListener('click', togglePause);
+    document.getElementById('restart').addEventListener('click', restart);
+    window.addEventListener('resize', resize);
+    document.addEventListener('visibilitychange', () => {
+      cancelAnimationFrame(animationFrame);
+      lastFrame = null;
+      schedule();
+    });
+    document.addEventListener('keydown', event => {
+      if (event.repeat || event.altKey || event.ctrlKey || event.metaKey || event.target.closest('input, textarea, select, [contenteditable]')) return;
+      if (event.code === 'Space' && !event.target.closest('button')) { event.preventDefault(); togglePause(); }
+      else if (event.key.toLowerCase() === 'r') { event.preventDefault(); restart(); }
+    });
+    try { if (!createWebGLRenderer()) useCanvasRenderer(); }
+    catch { useCanvasRenderer(); }
+    resize();
+    schedule();
+  })();
+  </script>
+</body>
+</html>

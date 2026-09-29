@@ -1,0 +1,540 @@
+{
+  "benchmark_id": "gargantua-offline-v1",
+  "date_local": "2026-09-30",
+  "model": "gpt-6.1-sol",
+  "effort": "max",
+  "service_tier_requested": "fast",
+  "repetitions_per_arm": 1,
+  "comparison": "full-mode-rule-text",
+  "prompt_sha256": "a65d627c4df979bb757c58bb3e8efa2b5e737784f52f8eadae89a24da0b32d3c",
+  "rule_revisions": {
+    "occam": {
+      "url": "https://github.com/quisbaum-prog/occam",
+      "commit": "244c2fc502209167116c9b72dbb0d95a4e0d6df9",
+      "mode": "full"
+    },
+    "ponytail": {
+      "url": "https://github.com/DietrichGebert/ponytail",
+      "commit": "e3ba2aa6f1e6f0bc4d69eb09c9f0d0a93af56156",
+      "version": "4.10.0",
+      "mode": "full"
+    }
+  },
+  "runtime": {
+    "images": {
+      "agent": "sha256:6306733fa5215b0fda1706622fd538cdf88358d559a804957ab361e764868c46",
+      "render": "sha256:b5e1e243806025f9aee83a23c722d8c7c5209982a180635eba7a06d9d09edc69"
+    },
+    "created_utc": "2026-09-29T22:26:10.934308+00:00",
+    "source_files": {
+      "benchmark.json": "81986d49d4bc883519eaed30600cf2314e67ecde3064d2b05389238d46fd6911",
+      "prompt.txt": "a65d627c4df979bb757c58bb3e8efa2b5e737784f52f8eadae89a24da0b32d3c",
+      "bench.py": "e86d83dd76f64eded63f2a629316206f471be99522e22b53cf11dbb94877c0dd",
+      "container/agent.Dockerfile": "0b474a6b7788ebdf9696978214754a69cbe50bd0a0128015e3817ef71be23a9b",
+      "container/capture.py": "c9822d49915d6acf7629cee269cbc19d82de1566a02a08ccc350f43563e78dba",
+      "container/cell.py": "fa466ecfd72d992532fdaa4f5f03f95883023010b1f36aa09f9c306e1f50ad5b",
+      "container/render.Dockerfile": "6b31adeaaa1a6b1ab24fb5f09cf8a20a580c4a474563aab6ee772cb8e59cbd45"
+    }
+  },
+  "schedule": [
+    {
+      "arm": "base",
+      "model": "gpt-6.1-sol",
+      "effort": "max",
+      "service_tier": "fast",
+      "repetition": 1
+    },
+    {
+      "arm": "ponytail",
+      "model": "gpt-6.1-sol",
+      "effort": "max",
+      "service_tier": "fast",
+      "repetition": 1
+    },
+    {
+      "arm": "occam",
+      "model": "gpt-6.1-sol",
+      "effort": "max",
+      "service_tier": "fast",
+      "repetition": 1
+    }
+  ],
+  "token_definition": "Input + output across unique completed sessions; cached input and reasoning are subsets counted once.",
+  "visual_review": "Independent visual scores pending; no objective visual winner established.",
+  "video_probe": {
+    "programs": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 1920,
+        "height": 490,
+        "r_frame_rate": "30/1",
+        "nb_frames": "300"
+      }
+    ],
+    "format": {
+      "duration": "10.000000"
+    }
+  },
+  "results": [
+    {
+      "arm": "base",
+      "model": "gpt-6.1-sol",
+      "effort": "max",
+      "repetition": 1,
+      "service_tier_requested": "fast",
+      "service_tier_supported": true,
+      "service_tier_served": null,
+      "service_tier_evidence": "explicit CLI configuration and live model catalog; served tier is not exposed in CLI JSON usage",
+      "backend": "codex-cli",
+      "comparison": "full-mode-rule-text",
+      "generation_wall_s": 693.322,
+      "exit_code": 0,
+      "timed_out": false,
+      "artifact_sha256": "8edac6c13c82d5ea92e7fb2bcff5d8e59f1ff1dc4c7becef08870e33cf0477f4",
+      "artifact_bytes": 30729,
+      "prompt_sha256": "a65d627c4df979bb757c58bb3e8efa2b5e737784f52f8eadae89a24da0b32d3c",
+      "rules_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "session_count": 1,
+      "usage": {
+        "input_tokens": 991116,
+        "cached_input_tokens": 925824,
+        "output_tokens": 33796,
+        "reasoning_output_tokens": 15977,
+        "total_tokens": 1024912
+      },
+      "usage_complete": true,
+      "model_effort_verified": true,
+      "rules_verified": true,
+      "delegation_verified": true,
+      "child_session_count": 0,
+      "accounting_version": 2,
+      "root_tool_calls": 30,
+      "valid_run": true,
+      "browser_checks": {
+        "page_errors": [],
+        "external_requests": [],
+        "offline_load": true,
+        "motion_pixel_difference_5s": 3.887739,
+        "motion_detected": true,
+        "pause_control_found": true,
+        "restart_control_found": true,
+        "pause_stable": true,
+        "resume_moves": true,
+        "restart_reproducible": true,
+        "fits_viewport": true,
+        "interpretation": "Pixel checks are evidence, not a visual score. Review false negatives manually.",
+        "chromium_version": "153.0.8010.12",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "renderer": "swiftshader",
+        "seconds": 10,
+        "fps": 30,
+        "rendering_wall_s": 225.703,
+        "artifact_sha256": "8edac6c13c82d5ea92e7fb2bcff5d8e59f1ff1dc4c7becef08870e33cf0477f4",
+        "screenshot_wait_ms": 300000,
+        "capture_code_sha256": "c9822d49915d6acf7629cee269cbc19d82de1566a02a08ccc350f43563e78dba"
+      },
+      "all_browser_checks_pass": true,
+      "completed_response_count": 26,
+      "response_usage_verified": true,
+      "container": {
+        "id": "7789127cb8dc7e44bff26c00960869c3ad54ae552ff734bf4fdaff60eff9c43e",
+        "image": "sha256:6306733fa5215b0fda1706622fd538cdf88358d559a804957ab361e764868c46",
+        "network_mode": "bridge",
+        "cpus_nano": 2000000000,
+        "memory": 4294967296,
+        "pids_limit": 256,
+        "mounts": [
+          {
+            "destination": "/input/job.json",
+            "writable": false
+          },
+          {
+            "destination": "/run/secrets/auth.json",
+            "writable": false
+          }
+        ],
+        "user": "bench",
+        "privileged": false,
+        "exit_code": 0,
+        "container_wall_s": 693.978
+      },
+      "render_container": {
+        "id": "8208055fe8316699cf23a28101a3ba0270b4aa136d214fc69a03ab7ae8e228cb",
+        "image": "sha256:b5e1e243806025f9aee83a23c722d8c7c5209982a180635eba7a06d9d09edc69",
+        "network_mode": "none",
+        "cpus_nano": 2000000000,
+        "memory": 4294967296,
+        "pids_limit": 256,
+        "mounts": [
+          {
+            "destination": "/input/benchmark.json",
+            "writable": false
+          },
+          {
+            "destination": "/source/index.html",
+            "writable": false
+          }
+        ],
+        "user": "bench",
+        "privileged": false,
+        "exit_code": 0,
+        "container_wall_s": 226.551
+      },
+      "speed_configuration": {
+        "service_tier": "fast",
+        "features.fast_mode": true
+      },
+      "model_capabilities": {
+        "slug": "gpt-6.1-sol",
+        "supported_reasoning_levels": [
+          {
+            "effort": "low",
+            "description": "Fast responses with lighter reasoning"
+          },
+          {
+            "effort": "medium",
+            "description": "Balances speed and reasoning depth for everyday tasks"
+          },
+          {
+            "effort": "high",
+            "description": "Greater reasoning depth for complex problems"
+          },
+          {
+            "effort": "xhigh",
+            "description": "Extra high reasoning depth for complex problems"
+          },
+          {
+            "effort": "max",
+            "description": "Maximum reasoning depth for the hardest problems"
+          },
+          {
+            "effort": "ultra",
+            "description": "Maximum reasoning with automatic task delegation"
+          }
+        ],
+        "additional_speed_tiers": [
+          "fast"
+        ],
+        "service_tiers": [
+          {
+            "id": "priority",
+            "name": "Fast",
+            "description": "2x speed, increased usage"
+          }
+        ]
+      },
+      "visual_score": null,
+      "independent_visual_review": "pending"
+    },
+    {
+      "arm": "occam",
+      "model": "gpt-6.1-sol",
+      "effort": "max",
+      "repetition": 1,
+      "service_tier_requested": "fast",
+      "service_tier_supported": true,
+      "service_tier_served": null,
+      "service_tier_evidence": "explicit CLI configuration and live model catalog; served tier is not exposed in CLI JSON usage",
+      "backend": "codex-cli",
+      "comparison": "full-mode-rule-text",
+      "generation_wall_s": 529.113,
+      "exit_code": 0,
+      "timed_out": false,
+      "artifact_sha256": "57d42dca84d5d0936f49227628383ceb61d4dc7e4af73a6b31ac009830d48060",
+      "artifact_bytes": 17338,
+      "prompt_sha256": "a65d627c4df979bb757c58bb3e8efa2b5e737784f52f8eadae89a24da0b32d3c",
+      "rules_sha256": "78188360ff7f10d999ac891824c2880d701ea3e8822eb2c78681d19973fc3255",
+      "session_count": 1,
+      "usage": {
+        "input_tokens": 913411,
+        "cached_input_tokens": 864256,
+        "output_tokens": 26548,
+        "reasoning_output_tokens": 14295,
+        "total_tokens": 939959
+      },
+      "usage_complete": true,
+      "model_effort_verified": true,
+      "rules_verified": true,
+      "delegation_verified": true,
+      "child_session_count": 0,
+      "accounting_version": 2,
+      "root_tool_calls": 26,
+      "valid_run": true,
+      "browser_checks": {
+        "page_errors": [],
+        "external_requests": [],
+        "offline_load": true,
+        "motion_pixel_difference_5s": 3.17204,
+        "motion_detected": true,
+        "pause_control_found": true,
+        "restart_control_found": true,
+        "pause_stable": true,
+        "resume_moves": true,
+        "restart_reproducible": true,
+        "fits_viewport": true,
+        "interpretation": "Pixel checks are evidence, not a visual score. Review false negatives manually.",
+        "chromium_version": "153.0.8010.12",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "renderer": "swiftshader",
+        "seconds": 10,
+        "fps": 30,
+        "rendering_wall_s": 124.474,
+        "artifact_sha256": "57d42dca84d5d0936f49227628383ceb61d4dc7e4af73a6b31ac009830d48060",
+        "screenshot_wait_ms": 300000,
+        "capture_code_sha256": "c9822d49915d6acf7629cee269cbc19d82de1566a02a08ccc350f43563e78dba"
+      },
+      "all_browser_checks_pass": true,
+      "completed_response_count": 27,
+      "response_usage_verified": true,
+      "container": {
+        "id": "d35765bb9d55ff0655b6525e4271d93b692affef789634c0c14299b36a7840e2",
+        "image": "sha256:6306733fa5215b0fda1706622fd538cdf88358d559a804957ab361e764868c46",
+        "network_mode": "bridge",
+        "cpus_nano": 2000000000,
+        "memory": 4294967296,
+        "pids_limit": 256,
+        "mounts": [
+          {
+            "destination": "/input/job.json",
+            "writable": false
+          },
+          {
+            "destination": "/run/secrets/auth.json",
+            "writable": false
+          }
+        ],
+        "user": "bench",
+        "privileged": false,
+        "exit_code": 0,
+        "container_wall_s": 529.755
+      },
+      "render_container": {
+        "id": "be23b16ec218ff9c70e37b7eaa4f1a65dcfdfddc364033aee61331edb76f76f5",
+        "image": "sha256:b5e1e243806025f9aee83a23c722d8c7c5209982a180635eba7a06d9d09edc69",
+        "network_mode": "none",
+        "cpus_nano": 2000000000,
+        "memory": 4294967296,
+        "pids_limit": 256,
+        "mounts": [
+          {
+            "destination": "/input/benchmark.json",
+            "writable": false
+          },
+          {
+            "destination": "/source/index.html",
+            "writable": false
+          }
+        ],
+        "user": "bench",
+        "privileged": false,
+        "exit_code": 0,
+        "container_wall_s": 125.34
+      },
+      "speed_configuration": {
+        "service_tier": "fast",
+        "features.fast_mode": true
+      },
+      "model_capabilities": {
+        "slug": "gpt-6.1-sol",
+        "supported_reasoning_levels": [
+          {
+            "effort": "low",
+            "description": "Fast responses with lighter reasoning"
+          },
+          {
+            "effort": "medium",
+            "description": "Balances speed and reasoning depth for everyday tasks"
+          },
+          {
+            "effort": "high",
+            "description": "Greater reasoning depth for complex problems"
+          },
+          {
+            "effort": "xhigh",
+            "description": "Extra high reasoning depth for complex problems"
+          },
+          {
+            "effort": "max",
+            "description": "Maximum reasoning depth for the hardest problems"
+          },
+          {
+            "effort": "ultra",
+            "description": "Maximum reasoning with automatic task delegation"
+          }
+        ],
+        "additional_speed_tiers": [
+          "fast"
+        ],
+        "service_tiers": [
+          {
+            "id": "priority",
+            "name": "Fast",
+            "description": "2x speed, increased usage"
+          }
+        ]
+      },
+      "visual_score": null,
+      "independent_visual_review": "pending"
+    },
+    {
+      "arm": "ponytail",
+      "model": "gpt-6.1-sol",
+      "effort": "max",
+      "repetition": 1,
+      "service_tier_requested": "fast",
+      "service_tier_supported": true,
+      "service_tier_served": null,
+      "service_tier_evidence": "explicit CLI configuration and live model catalog; served tier is not exposed in CLI JSON usage",
+      "backend": "codex-cli",
+      "comparison": "full-mode-rule-text",
+      "generation_wall_s": 497.184,
+      "exit_code": 0,
+      "timed_out": false,
+      "artifact_sha256": "ed135d7c7deab9541b574ec899f6674531e0bddd27d1d9159dc605161f5311d0",
+      "artifact_bytes": 23011,
+      "prompt_sha256": "a65d627c4df979bb757c58bb3e8efa2b5e737784f52f8eadae89a24da0b32d3c",
+      "rules_sha256": "da4fb09cff2f6726691ce6591cebc38c95597d79da132e49c6fa2665c4e8a3ff",
+      "session_count": 1,
+      "usage": {
+        "input_tokens": 937412,
+        "cached_input_tokens": 877440,
+        "output_tokens": 25560,
+        "reasoning_output_tokens": 11596,
+        "total_tokens": 962972
+      },
+      "usage_complete": true,
+      "model_effort_verified": true,
+      "rules_verified": true,
+      "delegation_verified": true,
+      "child_session_count": 0,
+      "accounting_version": 2,
+      "root_tool_calls": 25,
+      "valid_run": true,
+      "browser_checks": {
+        "page_errors": [],
+        "external_requests": [],
+        "offline_load": true,
+        "motion_pixel_difference_5s": 2.059847,
+        "motion_detected": true,
+        "pause_control_found": true,
+        "restart_control_found": true,
+        "pause_stable": true,
+        "resume_moves": true,
+        "restart_reproducible": true,
+        "fits_viewport": true,
+        "interpretation": "Pixel checks are evidence, not a visual score. Review false negatives manually.",
+        "chromium_version": "153.0.8010.12",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "renderer": "swiftshader",
+        "seconds": 10,
+        "fps": 30,
+        "rendering_wall_s": 252.585,
+        "artifact_sha256": "ed135d7c7deab9541b574ec899f6674531e0bddd27d1d9159dc605161f5311d0",
+        "screenshot_wait_ms": 300000,
+        "capture_code_sha256": "c9822d49915d6acf7629cee269cbc19d82de1566a02a08ccc350f43563e78dba"
+      },
+      "all_browser_checks_pass": true,
+      "completed_response_count": 26,
+      "response_usage_verified": true,
+      "container": {
+        "id": "74bbee36c0e6afc40489a6728a30ed85a071b63577eb807e5dca73deab6c9b2f",
+        "image": "sha256:6306733fa5215b0fda1706622fd538cdf88358d559a804957ab361e764868c46",
+        "network_mode": "bridge",
+        "cpus_nano": 2000000000,
+        "memory": 4294967296,
+        "pids_limit": 256,
+        "mounts": [
+          {
+            "destination": "/input/job.json",
+            "writable": false
+          },
+          {
+            "destination": "/run/secrets/auth.json",
+            "writable": false
+          }
+        ],
+        "user": "bench",
+        "privileged": false,
+        "exit_code": 0,
+        "container_wall_s": 497.836
+      },
+      "render_container": {
+        "id": "19006ec3fd43a5113b58f2fa755dcab5d49ee1c9b2b25ff6322fd2f80d8ce389",
+        "image": "sha256:b5e1e243806025f9aee83a23c722d8c7c5209982a180635eba7a06d9d09edc69",
+        "network_mode": "none",
+        "cpus_nano": 2000000000,
+        "memory": 4294967296,
+        "pids_limit": 256,
+        "mounts": [
+          {
+            "destination": "/input/benchmark.json",
+            "writable": false
+          },
+          {
+            "destination": "/source/index.html",
+            "writable": false
+          }
+        ],
+        "user": "bench",
+        "privileged": false,
+        "exit_code": 0,
+        "container_wall_s": 253.345
+      },
+      "speed_configuration": {
+        "service_tier": "fast",
+        "features.fast_mode": true
+      },
+      "model_capabilities": {
+        "slug": "gpt-6.1-sol",
+        "supported_reasoning_levels": [
+          {
+            "effort": "low",
+            "description": "Fast responses with lighter reasoning"
+          },
+          {
+            "effort": "medium",
+            "description": "Balances speed and reasoning depth for everyday tasks"
+          },
+          {
+            "effort": "high",
+            "description": "Greater reasoning depth for complex problems"
+          },
+          {
+            "effort": "xhigh",
+            "description": "Extra high reasoning depth for complex problems"
+          },
+          {
+            "effort": "max",
+            "description": "Maximum reasoning depth for the hardest problems"
+          },
+          {
+            "effort": "ultra",
+            "description": "Maximum reasoning with automatic task delegation"
+          }
+        ],
+        "additional_speed_tiers": [
+          "fast"
+        ],
+        "service_tiers": [
+          {
+            "id": "priority",
+            "name": "Fast",
+            "description": "2x speed, increased usage"
+          }
+        ]
+      },
+      "visual_score": null,
+      "independent_visual_review": "pending"
+    }
+  ]
+}

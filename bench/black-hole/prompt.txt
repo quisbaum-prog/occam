@@ -1,0 +1,13 @@
+Build an animated black hole inspired by Gargantua from Interstellar. Deliver one self-contained index.html that opens directly in a browser and works offline. Use HTML, CSS, JavaScript, and procedural graphics. Do not use external libraries, images, downloaded assets, or image-generation tools.
+
+Requirements:
+1. At 1280×800, show a centered circular black shadow with a diameter of approximately 30% of the viewport height.
+2. Surround it with a glowing horizontal accretion disk viewed nearly edge-on.
+3. Include a narrow bright rim and curved light above and below the shadow, suggesting gravitational lensing.
+4. Use white-gold light near the center, transitioning into orange toward the outer disk.
+5. Keep the camera fixed. Animate visible streaks or bright structures within the disk so rotation is unmistakable within five seconds.
+6. Start automatically. Add working Pause/Resume and Restart controls. Restart must restore the same initial scene and animation phase.
+
+Aim for cinematic visual quality. A visual approximation is sufficient; a physically exact simulation is not required.
+
+Complete the implementation without follow-up questions. Identify the finished file in your final response.

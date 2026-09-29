@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="388" viewBox="0 0 960 388" role="img" aria-labelledby="title description" font-family="Segoe UI,Arial,sans-serif">
+<title id="title">8.3% fewer tokens with Occam</title><desc id="description">base: 1,024,912 tokens | occam: 939,959 tokens | ponytail: 962,972 tokens. One run per arm, GPT-6.1 Sol max, Fast requested. Total input plus output, cached input included.</desc>
+<rect x="0.5" y="0.5" width="959" height="387" rx="16" fill="#0d1117" stroke="#303b48"/>
+<text x="32" y="40" fill="#a5b1c0" font-size="14">BLACK-HOLE PILOT · GPT-6.1 SOL · MAX · FAST</text>
+<text x="32" y="85" fill="#f0f6fc" font-size="30" font-weight="700">8.3% fewer tokens with Occam</text>
+<text x="32" y="112" fill="#a5b1c0" font-size="16">84,953 fewer tokens than Base on the same animation task</text>
+<line x1="160" x2="160" y1="144" y2="320" stroke="#303b48"/>
+<line x1="290.0" x2="290.0" y1="144" y2="320" stroke="#303b48"/>
+<line x1="420.0" x2="420.0" y1="144" y2="320" stroke="#303b48"/>
+<line x1="550.0" x2="550.0" y1="144" y2="320" stroke="#303b48"/>
+<line x1="680" x2="680" y1="144" y2="320" stroke="#303b48"/>
+<text x="32" y="180" fill="#f0f6fc" font-size="17" font-weight="500">Base</text>
+<rect x="160" y="155" width="520.000" height="36" rx="5" fill="#8d9eb5"><title>Base: 1,024,912 tokens; reference</title></rect>
+<text x="704" y="172" fill="#f0f6fc" font-size="18" font-weight="700">1,024,912</text>
+<text x="704" y="191" fill="#a5b1c0" font-size="13">reference</text>
+<text x="32" y="237" fill="#f0f6fc" font-size="17" font-weight="700">Occam</text>
+<rect x="160" y="212" width="476.898" height="36" rx="5" fill="#50c88e"><title>Occam: 939,959 tokens; -8.3% vs Base</title></rect>
+<text x="704" y="229" fill="#f0f6fc" font-size="18" font-weight="700">939,959</text>
+<text x="704" y="248" fill="#a5b1c0" font-size="13">-8.3% vs Base</text>
+<text x="32" y="294" fill="#f0f6fc" font-size="17" font-weight="500">Ponytail 4.10</text>
+<rect x="160" y="269" width="488.574" height="36" rx="5" fill="#f49a66"><title>Ponytail 4.10: 962,972 tokens; -6.0% vs Base</title></rect>
+<text x="704" y="286" fill="#f0f6fc" font-size="18" font-weight="700">962,972</text>
+<text x="704" y="305" fill="#a5b1c0" font-size="13">-6.0% vs Base</text>
+<text x="32" y="347" fill="#a5b1c0" font-size="14">Total tokens = input + output · cache and reasoning subsets counted once</text>
+<text x="32" y="370" fill="#a5b1c0" font-size="13">One attempt per arm · no confidence interval · compare visual results in the video</text>
+</svg>

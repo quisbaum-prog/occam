@@ -1,0 +1,31 @@
+{
+  "created_date": "2026-09-29",
+  "occam": {
+    "url": "https://github.com/quisbaum-prog/occam",
+    "commit": "244c2fc502209167116c9b72dbb0d95a4e0d6df9",
+    "mode": "full"
+  },
+  "ponytail": {
+    "url": "https://github.com/DietrichGebert/ponytail",
+    "commit": "e3ba2aa6f1e6f0bc4d69eb09c9f0d0a93af56156",
+    "version": "4.10.0",
+    "mode": "full"
+  },
+  "rules": {
+    "base": {
+      "file": "vendor/base.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "occam": {
+      "file": "vendor/occam-full.txt",
+      "sha256": "78188360ff7f10d999ac891824c2880d701ea3e8822eb2c78681d19973fc3255",
+      "bytes": 2633
+    },
+    "ponytail": {
+      "file": "vendor/ponytail-full.txt",
+      "sha256": "da4fb09cff2f6726691ce6591cebc38c95597d79da132e49c6fa2665c4e8a3ff",
+      "bytes": 5252
+    }
+  }
+}
