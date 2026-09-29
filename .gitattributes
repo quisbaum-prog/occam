@@ -1,0 +1,2 @@
+# Preserve exact bytes for frozen inputs, source provenance, and original artifacts.
+bench/black-hole/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

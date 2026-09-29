@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#050609">
+  <title>Gargantua — An interstellar study</title>
+  <style>
+    :root { color-scheme: dark; font-family: Arial, Helvetica, sans-serif; }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #050609; }
+    body { color: #e9e5dc; }
+    canvas { position: fixed; inset: 0; display: block; width: 100%; height: 100%; }
+    .frame { position: fixed; inset: 0; pointer-events: none; box-shadow: inset 0 0 140px 35px rgba(0,0,0,.32); }
+    .masthead { position: fixed; top: 36px; left: 42px; right: 42px; display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; pointer-events: none; }
+    .identity { display: flex; align-items: center; gap: 15px; }
+    .mark { width: 31px; height: 31px; color: #d8bc83; flex: none; }
+    h1 { margin: 0 0 8px; font-size: 16px; font-weight: 400; letter-spacing: .31em; text-transform: uppercase; }
+    .subtitle, .kicker { margin: 0; font-size: 9px; letter-spacing: .22em; font-weight: 400; color: #7d7f86; text-transform: uppercase; }
+    .telemetry { text-align: right; padding-top: 1px; font-family: 'Courier New', monospace; }
+    .state { display: flex; align-items: center; justify-content: flex-end; gap: 8px; color: #9b9a96; font-size: 9px; letter-spacing: .14em; }
+    .led { width: 4px; height: 4px; border-radius: 50%; background: #dbba7c; box-shadow: 0 0 9px #dbba7c80; }
+    .paused .led { background: #747780; box-shadow: none; }
+    #elapsed { display: block; margin-top: 9px; font-size: 11px; font-variant-numeric: tabular-nums; letter-spacing: .08em; color: #666973; }
+    footer { position: fixed; bottom: 34px; left: 42px; right: 42px; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; }
+    .caption { pointer-events: none; }
+    .caption p { margin: 10px 0 3px; color: #b4b2b0; font-size: 15px; font-weight: 400; letter-spacing: .02em; }
+    .controls { display: flex; align-items: center; gap: 9px; }
+    button { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 44px; border: 1px solid #ffffff1c; border-radius: 5px; padding: 0 18px; background: #111217b8; color: #c9c8c5; font: 12px Arial, Helvetica, sans-serif; letter-spacing: .03em; cursor: pointer; transition: border-color .2s, background .2s, color .2s; -webkit-tap-highlight-color: transparent; }
+    button:hover { border-color: #cfb57c70; background: #201d19e0; color: #f5e7cb; }
+    button:active { background: #30291ce0; }
+    button:focus-visible { outline: 2px solid #d8bc83; outline-offset: 4px; }
+    button svg { width: 14px; height: 14px; flex: none; }
+    #pause { min-width: 108px; }
+    .resume-icon { display: none; }
+    .paused .pause-icon { display: none; }
+    .paused .resume-icon { display: block; }
+    noscript { position: fixed; top: 45%; left: 10%; right: 10%; text-align: center; color: #d8bc83; }
+    @media (max-width: 620px) {
+      .masthead { top: 24px; left: 22px; right: 22px; }
+      .identity { gap: 10px; }
+      .mark { width: 24px; height: 24px; }
+      h1 { font-size: 13px; letter-spacing: .24em; }
+      .subtitle { font-size: 7px; letter-spacing: .13em; }
+      .state { font-size: 7px; letter-spacing: .04em; }
+      #elapsed { font-size: 9px; }
+      footer { bottom: 24px; left: 22px; right: 22px; flex-direction: column; align-items: center; gap: 20px; }
+      .caption { text-align: center; }
+      .caption p { font-size: 13px; }
+      .kicker { font-size: 8px; }
+      button { min-height: 46px; }
+    }
+    @media (max-height: 430px) {
+      .masthead { top: 18px; }
+      footer { bottom: 16px; flex-direction: row; }
+      .caption p { margin-top: 6px; font-size: 12px; }
+    }
+    @media (prefers-reduced-motion: reduce) { button { transition: none; } }
+  </style>
+</head>
+<body>
+  <canvas id="universe" role="img" aria-label="An animated black hole: a circular black shadow, a white-gold photon rim, and rotating orange accretion filaments bent into arcs above and below it."></canvas>
+  <div class="frame" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="identity">
+      <svg class="mark" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+        <circle cx="20" cy="20" r="10" stroke="currentColor" stroke-width="1"/>
+        <ellipse cx="20" cy="20" rx="19" ry="4.5" stroke="currentColor" stroke-width=".8" transform="rotate(-24 20 20)"/>
+        <path d="M11.2 15.2a10 10 0 0 1 17.6 0" stroke="#f8e8c9" stroke-width="1.5"/>
+      </svg>
+      <div>
+        <h1>Gargantua</h1>
+        <p class="subtitle">Light at the event horizon</p>
+      </div>
+    </div>
+    <div class="telemetry">
+      <div class="state"><span class="led" aria-hidden="true"></span><span id="state">SIMULATION LIVE</span></div>
+      <output id="elapsed" aria-label="Simulation elapsed time">T + 00:00.0</output>
+    </div>
+  </header>
+  <footer>
+    <div class="caption">
+      <span class="kicker">An interstellar study</span>
+      <p>At the edge of infinity.</p>
+    </div>
+    <div class="controls" aria-label="Animation controls">
+      <button id="pause" type="button" aria-pressed="false" aria-label="Pause animation" title="Pause / Resume (Space)">
+        <svg class="pause-icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><rect x="4" y="3" width="2.5" height="10" rx=".6"/><rect x="9.5" y="3" width="2.5" height="10" rx=".6"/></svg>
+        <svg class="resume-icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4.5 2.6a.5.5 0 0 1 .75-.43l8 5.4a.5.5 0 0 1 0 .86l-8 5.4a.5.5 0 0 1-.75-.43z"/></svg>
+        <span id="pause-label">Pause</span>
+      </button>
+      <button id="restart" type="button" title="Restart (R)" aria-label="Restart animation from the initial scene">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5.5A5.3 5.3 0 1 1 2.8 10M3 2v3.5h3.5"/></svg>
+        <span>Restart</span>
+      </button>
+    </div>
+  </footer>
+  <noscript>Enable JavaScript to explore the event horizon.</noscript>
+
+  <script>
+  (() => {
+    'use strict';
+
+    // Everything is generated locally. This seed fixes the stars and the initial scene.
+    const SEED = 0x6a09e667;
+    const TAU = Math.PI * 2;
+    let canvas = document.getElementById('universe');
+    const pauseButton = document.getElementById('pause');
+    const pauseLabel = document.getElementById('pause-label');
+    const stateLabel = document.getElementById('state');
+    const elapsedLabel = document.getElementById('elapsed');
+    let time = 0;
+    let running = true;
+    let lastTimestamp = null;
+    let animationFrame = null;
+    let lastReadout = '';
+
+    function randomGenerator(seed) {
+      return function () {
+        seed |= 0;
+        seed = seed + 0x6d2b79f5 | 0;
+        let n = Math.imul(seed ^ seed >>> 15, 1 | seed);
+        n = n + Math.imul(n ^ n >>> 7, 61 | n) ^ n;
+        return ((n ^ n >>> 14) >>> 0) / 4294967296;
+      };
+    }
+
+    function makeSky(width, height) {
+      const sky = document.createElement('canvas');
+      sky.width = width;
+      sky.height = height;
+      const ctx = sky.getContext('2d');
+      const random = randomGenerator(SEED);
+      ctx.fillStyle = '#050609';
+      ctx.fillRect(0, 0, width, height);
+      const haze = ctx.createRadialGradient(width * .48, height * .48, 0, width * .48, height * .48, width * .68);
+      haze.addColorStop(0, '#0a0b10');
+      haze.addColorStop(.48, '#08090e');
+      haze.addColorStop(1, '#040508');
+      ctx.fillStyle = haze;
+      ctx.fillRect(0, 0, width, height);
+      // Sparse, very faint dust; no moving stars and no camera motion.
+      for (let i = 0; i < 22; i++) {
+        const x = random() * width, y = random() * height;
+        const size = width * (.10 + random() * .17);
+        const dust = ctx.createRadialGradient(x, y, 0, x, y, size);
+        dust.addColorStop(0, 'rgba(53, 57, 76, 0.018)');
+        dust.addColorStop(1, 'rgba(8, 9, 14, 0)');
+        ctx.fillStyle = dust;
+        ctx.fillRect(x - size, y - size, size * 2, size * 2);
+      }
+      const count = Math.round(width * height / 5400);
+      for (let i = 0; i < count; i++) {
+        const x = random() * width, y = random() * height;
+        const brightness = .08 + Math.pow(random(), 5) * .53;
+        const radius = .28 + Math.pow(random(), 3) * .72;
+        if (brightness > .40) {
+          const glow = ctx.createRadialGradient(x, y, 0, x, y, 4);
+          glow.addColorStop(0, 'rgba(173, 189, 214, ' + brightness * .20 + ')');
+          glow.addColorStop(1, 'rgba(173, 189, 214, 0)');
+          ctx.fillStyle = glow;
+          ctx.fillRect(x - 4, y - 4, 8, 8);
+        }
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, TAU);
+        ctx.fillStyle = 'rgba(190, 199, 215, ' + brightness + ')';
+        ctx.fill();
+      }
+      return sky;
+    }
+
+    const vertexSource = `
+      attribute vec2 aPosition;
+      varying vec2 vUv;
+      void main() {
+        vUv = aPosition * 0.5 + 0.5;
+        gl_Position = vec4(aPosition, 0.0, 1.0);
+      }
+    `;
+
+    // An artistic screen-space lens: the same advected disk texture is sampled
+    // by the direct image and two curved, compressed images around the shadow.
+    const sceneSource = `
+      precision highp float;
+      varying vec2 vUv;
+      uniform vec2 uResolution;
+      uniform float uRadius;
+      uniform float uTime;
+      uniform sampler2D uSky;
+
+      float hash(vec2 p) {
+        p = fract(p * vec2(123.34, 456.21));
+        p += dot(p, p + 45.32);
+        return fract(p.x * p.y);
+      }
+      float noise(vec2 p) {
+        vec2 i = floor(p), f = fract(p);
+        f = f * f * (3.0 - 2.0 * f);
+        return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x),
+                   mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0)), f.x), f.y);
+      }
+
+      vec3 disk(float r, float azimuth, float magnification) {
+        if (r < 1.12 || r > 5.3) return vec3(0.0);
+        // Differential rotation, with faster orbits toward the center.
+        float phase = azimuth - uTime * 1.85 / pow(r, 1.25);
+        float turbulence = noise(vec2(r * 7.0 + cos(phase * 2.0),
+                                      sin(phase) * 8.0 + cos(phase * 3.0) * 1.5));
+        float waviness = sin(phase * 3.0 + r * 3.1) * 3.1
+                       + sin(phase * 9.0 - r * 1.7) * 1.1 + turbulence * 9.0;
+        float wave = r * 64.0 + waviness;
+        float aa = 1.0;
+        #ifdef HAS_DERIVATIVES
+          aa = 1.0 - smoothstep(1.5, 5.8, fwidth(wave));
+        #endif
+        float threads = 0.5 + 0.5 * sin(wave) * aa;
+        threads = threads * threads;
+        float fine = noise(vec2(r * 18.0 + turbulence * 2.0,
+                                sin(phase * 3.0) * 6.5 + cos(phase * 7.0) * 1.8));
+        float clouds = noise(vec2(r * 5.5 + cos(phase) * 1.3, sin(phase) * 4.5));
+        float spiral = pow(0.5 + 0.5 * sin(phase * 5.0 + r * 3.7), 3.0);
+        float density = (0.10 + threads * 1.05) * pow(0.20 + fine * 0.90, 1.6)
+                      * (0.28 + clouds * 0.82 + spiral * 0.60);
+        // Coherent orbiting hot spots and trailing arcs make motion easy to see.
+        float spotA = exp(-pow((r - 2.30) * 7.0, 2.0));
+        float spotB = exp(-pow((r - 3.65) * 6.0, 2.0));
+        float spotC = exp(-pow((r - 1.55) * 9.0, 2.0));
+        density += spotA * (pow(0.5 + 0.5 * cos(phase - 0.45), 42.0) * 2.5
+                         + pow(0.5 + 0.5 * cos(phase - 0.85), 10.0) * 0.45);
+        density += spotB * pow(0.5 + 0.5 * cos(phase - 2.70), 32.0) * 2.8;
+        density += spotC * pow(0.5 + 0.5 * cos(phase - 1.55), 24.0) * 1.3;
+        float edge = smoothstep(1.12, 1.27, r) * (1.0 - smoothstep(3.85, 5.3, r));
+        float emissivity = 5.8 * edge * pow(r, -0.72) * density;
+        float heat = exp(-(r - 1.15) * 0.72);
+        vec3 temperature = mix(vec3(1.0, 0.30, 0.055), vec3(1.0, 0.86, 0.57), heat);
+        float beaming = 1.0 - cos(azimuth) * 0.20;
+        return temperature * emissivity * beaming * magnification;
+      }
+
+      void main() {
+        vec2 p = (vUv * uResolution - uResolution * 0.5) / uRadius;
+        float rho = length(p);
+        float pixel = 1.0 / uRadius;
+        float angle = atan(p.y, p.x);
+        float lens = 0.018 / (rho * rho + 0.15);
+        vec2 skyUv = 0.5 + (vUv - 0.5) * (1.0 + lens);
+        vec3 sky = texture2D(uSky, skyUv).rgb;
+        vec3 light = vec3(0.0);
+
+        // The direct disk is inclined just five degrees to the line of sight.
+        float diskY = p.y / 0.085;
+        float diskR = length(vec2(p.x, diskY));
+        if (diskR > 1.12 && diskR < 5.3) {
+          light += disk(diskR, atan(diskY, p.x), 1.0);
+        }
+        // A narrow central sheet and diffuse scattering soften the thin disk.
+        float outerFade = exp(-pow(abs(p.x) / 4.55, 4.0));
+        float sideHeat = exp(-max(abs(p.x) - 1.0, 0.0) * 0.65);
+        vec3 sideColor = mix(vec3(1.0, 0.26, 0.035), vec3(1.0, 0.79, 0.46), sideHeat);
+        float sheet = exp(-abs(p.y) / (0.013 + pixel)) * outerFade;
+        float sheetFlow = 0.72 + 0.28 * sin(p.x * 10.0 - uTime * 2.8 + sin(p.x * 3.0));
+        light += sideColor * sheet * sheetFlow * 0.76;
+        light += sideColor * exp(-abs(p.y) / (0.10 + abs(p.x) * 0.035)) * outerFade * 0.13;
+
+        // Strongly compressed back-side light arches above the event horizon;
+        // a fainter, thinner image curves beneath it.
+        float arcGate = smoothstep(0.025, 0.22, abs(p.y));
+        if (rho > 1.038 && rho < 1.66) {
+          float mappedR = 1.15 + (rho - 1.038) * (p.y > 0.0 ? 7.0 : 11.5);
+          float strength = p.y > 0.0 ? 1.10 : 0.61;
+          light += disk(mappedR, angle, strength) * arcGate;
+        }
+        float arcHaze = exp(-pow((rho - 1.23) / 0.29, 2.0)) * arcGate;
+        light += vec3(1.0, 0.47, 0.15) * arcHaze * (p.y > 0.0 ? 0.09 : 0.035);
+
+        // The photon rim remains just outside the precisely circular shadow.
+        float ringDistance = abs(rho - 1.009);
+        float ring = exp(-ringDistance / (0.0045 + pixel * 0.60));
+        float ringFlow = 0.86 + 0.14 * sin(angle * 8.0 - uTime * 1.6);
+        float rimBeaming = 0.90 - p.x / max(rho, 0.01) * 0.18;
+        light += vec3(1.0, 0.86, 0.61) * ring * 5.4 * ringFlow * rimBeaming;
+        light += vec3(1.0, 0.60, 0.26) * exp(-ringDistance / 0.040) * 0.25;
+
+        // Film-like exposure preserves bright white cores and warm, fine threads.
+        vec3 emission = pow(1.0 - exp(-light * 1.12), vec3(0.82));
+        vec3 color = sky + emission;
+        float shadow = smoothstep(1.0 - pixel * 0.65, 1.0 + pixel * 0.65, rho);
+        color = mix(vec3(0.001, 0.0012, 0.0015), color, shadow);
+        gl_FragColor = vec4(color, 1.0);
+      }
+    `;
+
+    const extractSource = `
+      precision mediump float;
+      varying vec2 vUv;
+      uniform sampler2D uImage;
+      uniform vec2 uTexel;
+      void main() {
+        vec3 c = (texture2D(uImage, vUv + uTexel * vec2(-0.5, -0.5)).rgb
+                + texture2D(uImage, vUv + uTexel * vec2( 0.5, -0.5)).rgb
+                + texture2D(uImage, vUv + uTexel * vec2(-0.5,  0.5)).rgb
+                + texture2D(uImage, vUv + uTexel * vec2( 0.5,  0.5)).rgb) * 0.25;
+        float brightness = max(c.r, max(c.g, c.b));
+        gl_FragColor = vec4(c * smoothstep(0.48, 0.95, brightness), 1.0);
+      }
+    `;
+    const blurSource = `
+      precision mediump float;
+      varying vec2 vUv;
+      uniform sampler2D uImage;
+      uniform vec2 uDirection;
+      void main() {
+        vec3 c = texture2D(uImage, vUv).rgb * 0.227027;
+        c += texture2D(uImage, vUv + uDirection * 1.384615).rgb * 0.316216;
+        c += texture2D(uImage, vUv - uDirection * 1.384615).rgb * 0.316216;
+        c += texture2D(uImage, vUv + uDirection * 3.230769).rgb * 0.070270;
+        c += texture2D(uImage, vUv - uDirection * 3.230769).rgb * 0.070270;
+        gl_FragColor = vec4(c, 1.0);
+      }
+    `;
+    const compositeSource = `
+      precision highp float;
+      varying vec2 vUv;
+      uniform sampler2D uScene;
+      uniform sampler2D uBloom;
+      uniform vec2 uResolution;
+      uniform float uRadius;
+      void main() {
+        vec3 scene = texture2D(uScene, vUv).rgb;
+        vec3 bloom = texture2D(uBloom, vUv).rgb;
+        vec3 c = scene + bloom * 0.52;
+        vec2 p = (vUv * uResolution - uResolution * 0.5) / uRadius;
+        // Keep the interior black even when the luminous rim is bloomed.
+        c *= smoothstep(0.978, 1.012, length(p));
+        float vignette = 1.0 - 0.22 * pow(length((vUv - 0.5) * vec2(1.15, 1.0)), 1.6);
+        c *= vignette;
+        // Static sub-pixel film grain, so pausing freezes the complete image.
+        float grain = fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453);
+        c += (grain - 0.5) * 0.004 * smoothstep(1.01, 1.10, length(p));
+        gl_FragColor = vec4(c, 1.0);
+      }
+    `;
+
+    function createWebGLRenderer(targetCanvas) {
+      const gl = targetCanvas.getContext('webgl', {
+        alpha: false, antialias: false, depth: false, stencil: false,
+        powerPreference: 'high-performance', preserveDrawingBuffer: true
+      });
+      if (!gl) throw new Error('WebGL unavailable');
+      const derivatives = gl.getExtension('OES_standard_derivatives');
+      let width = 1, height = 1, bloomWidth = 1, bloomHeight = 1, radius = 1;
+      function compile(type, source) {
+        const shader = gl.createShader(type);
+        gl.shaderSource(shader, source);
+        gl.compileShader(shader);
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+          const message = gl.getShaderInfoLog(shader);
+          gl.deleteShader(shader);
+          throw new Error(message);
+        }
+        return shader;
+      }
+      const vertex = compile(gl.VERTEX_SHADER, vertexSource);
+      function program(source) {
+        const fragment = compile(gl.FRAGMENT_SHADER, source);
+        const p = gl.createProgram();
+        gl.attachShader(p, vertex);
+        gl.attachShader(p, fragment);
+        gl.linkProgram(p);
+        gl.deleteShader(fragment);
+        if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
+        return { program: p, position: gl.getAttribLocation(p, 'aPosition'), uniforms: {} };
+      }
+      const prefix = derivatives ? '#extension GL_OES_standard_derivatives : enable\n#define HAS_DERIVATIVES\n' : '';
+      const scene = program(prefix + sceneSource);
+      const extract = program(extractSource);
+      const blur = program(blurSource);
+      const composite = program(compositeSource);
+      const triangle = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, triangle);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+
+      function texture() {
+        const t = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, t);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        return t;
+      }
+      function renderTarget() {
+        const t = texture();
+        const f = gl.createFramebuffer();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, f);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, t, 0);
+        return { texture: t, framebuffer: f };
+      }
+      const sceneTarget = renderTarget();
+      const bloomA = renderTarget();
+      const bloomB = renderTarget();
+      const skyTexture = texture();
+      function allocate(target, w, h) {
+        gl.bindTexture(gl.TEXTURE_2D, target.texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, target.framebuffer);
+        if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) throw new Error('Incomplete framebuffer');
+      }
+      function use(p, target, w, h) {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, target ? target.framebuffer : null);
+        gl.viewport(0, 0, w, h);
+        gl.useProgram(p.program);
+        gl.bindBuffer(gl.ARRAY_BUFFER, triangle);
+        gl.enableVertexAttribArray(p.position);
+        gl.vertexAttribPointer(p.position, 2, gl.FLOAT, false, 0, 0);
+      }
+      function uniform(p, name) {
+        if (!(name in p.uniforms)) p.uniforms[name] = gl.getUniformLocation(p.program, name);
+        return p.uniforms[name];
+      }
+      function sample(p, name, t, unit) {
+        gl.activeTexture(gl.TEXTURE0 + unit);
+        gl.bindTexture(gl.TEXTURE_2D, t);
+        gl.uniform1i(uniform(p, name), unit);
+      }
+      function drawTriangle() { gl.drawArrays(gl.TRIANGLES, 0, 3); }
+      function blurPass(source, destination, x, y) {
+        use(blur, destination, bloomWidth, bloomHeight);
+        sample(blur, 'uImage', source.texture, 0);
+        gl.uniform2f(uniform(blur, 'uDirection'), x, y);
+        drawTriangle();
+      }
+      return {
+        resize(cssWidth, cssHeight) {
+          const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5, 1920 / cssWidth);
+          width = Math.max(1, Math.round(cssWidth * pixelRatio));
+          height = Math.max(1, Math.round(cssHeight * pixelRatio));
+          radius = Math.min(cssHeight * .15, cssWidth * .24) * pixelRatio;
+          targetCanvas.width = width;
+          targetCanvas.height = height;
+          bloomWidth = Math.max(1, Math.round(width / 4));
+          bloomHeight = Math.max(1, Math.round(height / 4));
+          allocate(sceneTarget, width, height);
+          allocate(bloomA, bloomWidth, bloomHeight);
+          allocate(bloomB, bloomWidth, bloomHeight);
+          gl.activeTexture(gl.TEXTURE0);
+          gl.bindTexture(gl.TEXTURE_2D, skyTexture);
+          gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, makeSky(cssWidth, cssHeight));
+          gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+        },
+        draw(t) {
+          use(scene, sceneTarget, width, height);
+          sample(scene, 'uSky', skyTexture, 0);
+          gl.uniform2f(uniform(scene, 'uResolution'), width, height);
+          gl.uniform1f(uniform(scene, 'uRadius'), radius);
+          gl.uniform1f(uniform(scene, 'uTime'), t);
+          drawTriangle();
+          use(extract, bloomA, bloomWidth, bloomHeight);
+          sample(extract, 'uImage', sceneTarget.texture, 0);
+          gl.uniform2f(uniform(extract, 'uTexel'), 1 / width, 1 / height);
+          drawTriangle();
+          blurPass(bloomA, bloomB, 1 / bloomWidth, 0);
+          blurPass(bloomB, bloomA, 0, 1 / bloomHeight);
+          blurPass(bloomA, bloomB, 2 / bloomWidth, 0);
+          blurPass(bloomB, bloomA, 0, 2 / bloomHeight);
+          use(composite, null, width, height);
+          sample(composite, 'uScene', sceneTarget.texture, 0);
+          sample(composite, 'uBloom', bloomA.texture, 1);
+          gl.uniform2f(uniform(composite, 'uResolution'), width, height);
+          gl.uniform1f(uniform(composite, 'uRadius'), radius);
+          drawTriangle();
+        }
+      };
+    }
+
+    // A procedural Canvas renderer keeps the file usable when WebGL is disabled.
+    function createCanvasRenderer(targetCanvas) {
+      const ctx = targetCanvas.getContext('2d', { alpha: false });
+      let width = 1, height = 1, radius = 1, sky;
+      function color(r, alpha) {
+        const heat = Math.exp(-(r - 1.15) * .72);
+        return 'rgba(255,' + Math.round(85 + heat * 145) + ',' + Math.round(18 + heat * 145) + ',' + alpha + ')';
+      }
+      return {
+        resize(w, h) {
+          const dpr = Math.min(window.devicePixelRatio || 1, 1.5, 1920 / w);
+          width = w; height = h;
+          radius = Math.min(h * .15, w * .24);
+          targetCanvas.width = Math.round(w * dpr);
+          targetCanvas.height = Math.round(h * dpr);
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          sky = makeSky(w, h);
+        },
+        draw(t) {
+          ctx.globalCompositeOperation = 'source-over';
+          ctx.shadowBlur = 0;
+          ctx.drawImage(sky, 0, 0, width, height);
+          ctx.save();
+          ctx.translate(width / 2, height / 2);
+          const glow = ctx.createRadialGradient(0, 0, radius * .85, 0, 0, radius * 1.8);
+          glow.addColorStop(0, 'rgba(255, 189, 97, .10)');
+          glow.addColorStop(.4, 'rgba(255, 155, 55, .06)');
+          glow.addColorStop(1, 'rgba(255, 155, 55, 0)');
+          ctx.fillStyle = glow;
+          ctx.fillRect(-radius * 2, -radius * 2, radius * 4, radius * 4);
+          ctx.globalCompositeOperation = 'screen';
+          const diskGlow = ctx.createLinearGradient(0, -radius * .45, 0, radius * .45);
+          diskGlow.addColorStop(0, 'rgba(240, 139, 47, 0)');
+          diskGlow.addColorStop(.5, 'rgba(240, 161, 65, .16)');
+          diskGlow.addColorStop(1, 'rgba(240, 139, 47, 0)');
+          ctx.fillStyle = diskGlow;
+          ctx.fillRect(-radius * 4.8, -radius * .45, radius * 9.6, radius * .9);
+          for (let r = 5.28; r > 1.13; r -= .024) {
+            const fade = Math.min(1, (5.3 - r) / 1.45, (r - 1.12) / .15);
+            const thread = .22 + .30 * (.5 + .5 * Math.sin(r * 64 + Math.sin(t * 1.85 / Math.pow(r, 1.25)) * 1.6));
+            ctx.lineWidth = .65;
+            ctx.strokeStyle = color(r, fade * thread);
+            ctx.beginPath();
+            ctx.ellipse(0, 0, r * radius, r * radius * .085, 0, 0, TAU);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(0, 0, radius * (1.038 + (r - 1.15) / 7), Math.PI, TAU);
+            ctx.stroke();
+            ctx.globalAlpha = .55;
+            ctx.beginPath();
+            ctx.arc(0, 0, radius * (1.038 + (r - 1.15) / 11.5), 0, Math.PI);
+            ctx.stroke();
+            ctx.globalAlpha = 1;
+          }
+          // Short emissive arcs travel around real ellipses, including lensed images.
+          for (const [r, initial] of [[2.30, .45], [3.65, 2.70], [1.55, 1.55], [2.85, 4.5]]) {
+            const phase = t * 1.85 / Math.pow(r, 1.25) + initial;
+            ctx.strokeStyle = 'rgba(255, 232, 181, .9)';
+            ctx.shadowColor = '#ffd08a';
+            ctx.shadowBlur = 10;
+            ctx.lineWidth = 1.8;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, r * radius, r * radius * .085, 0, -phase - .17, -phase + .17);
+            ctx.stroke();
+            const normalized = ((phase % TAU) + TAU) % TAU;
+            const upper = normalized < Math.PI;
+            ctx.beginPath();
+            ctx.arc(0, 0, radius * (1.038 + (r - 1.15) / (upper ? 7 : 11.5)), -phase - .14, -phase + .14);
+            ctx.stroke();
+          }
+          ctx.shadowBlur = 0;
+          ctx.globalCompositeOperation = 'source-over';
+          ctx.fillStyle = '#000001';
+          ctx.beginPath();
+          ctx.arc(0, 0, radius, 0, TAU);
+          ctx.fill();
+          ctx.strokeStyle = '#ffebc2';
+          ctx.shadowColor = '#ffcf86';
+          ctx.shadowBlur = 11;
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.arc(0, 0, radius * 1.009, 0, TAU);
+          ctx.stroke();
+          ctx.restore();
+        }
+      };
+    }
+
+    function replaceCanvas() {
+      const replacement = canvas.cloneNode(false);
+      canvas.replaceWith(replacement);
+      canvas = replacement;
+      return replacement;
+    }
+    let renderer;
+    try {
+      renderer = createWebGLRenderer(canvas);
+      canvas.addEventListener('webglcontextlost', event => {
+        event.preventDefault();
+        renderer = createCanvasRenderer(replaceCanvas());
+        resize();
+      }, { once: true });
+    } catch (error) {
+      renderer = createCanvasRenderer(replaceCanvas());
+    }
+
+    function updateReadout() {
+      const tenths = Math.floor(time * 10 + 0.00001);
+      const minutes = String(Math.floor(tenths / 600)).padStart(2, '0');
+      const seconds = String(Math.floor(tenths / 10) % 60).padStart(2, '0');
+      const text = 'T + ' + minutes + ':' + seconds + '.' + tenths % 10;
+      if (text !== lastReadout) { elapsedLabel.textContent = text; lastReadout = text; }
+    }
+    function updateControls() {
+      document.body.classList.toggle('paused', !running);
+      pauseLabel.textContent = running ? 'Pause' : 'Resume';
+      pauseButton.setAttribute('aria-pressed', String(!running));
+      pauseButton.setAttribute('aria-label', running ? 'Pause animation' : 'Resume animation');
+      stateLabel.textContent = running ? 'SIMULATION LIVE' : 'SIMULATION PAUSED';
+      updateReadout();
+    }
+    function frame(timestamp) {
+      animationFrame = null;
+      if (!running || document.hidden) { lastTimestamp = null; return; }
+      if (lastTimestamp !== null) time += (timestamp - lastTimestamp) / 1000;
+      lastTimestamp = timestamp;
+      renderer.draw(time);
+      updateReadout();
+      animationFrame = requestAnimationFrame(frame);
+    }
+    function stopLoop() {
+      if (animationFrame !== null) cancelAnimationFrame(animationFrame);
+      animationFrame = null;
+      lastTimestamp = null;
+    }
+    function startLoop() {
+      if (animationFrame === null && running && !document.hidden) {
+        lastTimestamp = null;
+        animationFrame = requestAnimationFrame(frame);
+      }
+    }
+    function togglePause() {
+      running = !running;
+      if (running) startLoop(); else stopLoop();
+      updateControls();
+    }
+    function restart() {
+      stopLoop();
+      time = 0;
+      running = true;
+      renderer.draw(0);
+      updateControls();
+      startLoop();
+    }
+    function resize() {
+      renderer.resize(window.innerWidth, window.innerHeight);
+      renderer.draw(time);
+    }
+    pauseButton.addEventListener('click', togglePause);
+    document.getElementById('restart').addEventListener('click', restart);
+    window.addEventListener('keydown', event => {
+      if (event.altKey || event.ctrlKey || event.metaKey || event.repeat) return;
+      if (event.target.closest('input, textarea, select, [contenteditable]')) return;
+      if (event.code === 'Space' && !event.target.closest('button')) {
+        event.preventDefault(); togglePause();
+      }
+      if (event.key.toLowerCase() === 'r') { event.preventDefault(); restart(); }
+    });
+    window.addEventListener('resize', resize);
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stopLoop(); else startLoop();
+    });
+    resize();
+    updateControls();
+    startLoop();
+  })();
+  </script>
+</body>
+</html>

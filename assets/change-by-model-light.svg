@@ -1,17 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 494" width="760" height="494" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 430" width="760" height="430" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
 <text x="0" y="16" font-size="15" font-weight="600" fill="#1f2328">Change vs. no plugin, by model and effort</text>
 <text x="0" y="35" font-size="12" fill="#59636e">Dot: typical task (geometric mean of paired tasks). Line: 95% interval. Not crossing 0% = a clear difference.</text>
 <text x="496.3" y="60" font-size="12" text-anchor="end" fill="#59636e">← cheaper</text><text x="512.3" y="60" font-size="12" fill="#59636e">more expensive →</text>
 <circle cx="5" cy="56" r="5" fill="#2a78d6"/><text x="17" y="60" font-size="13" fill="#59636e">Occam</text>
 <circle cx="79" cy="56" r="5" fill="#eb6834"/><text x="91" y="60" font-size="13" fill="#59636e">Ponytail 4.10</text>
-<line x1="230.0" x2="230.0" y1="68" y2="468" stroke="#d1d9e0" stroke-width="1"/><text x="230.0" y="486" font-size="12" text-anchor="middle" fill="#59636e">−80%</text>
-<line x1="298.6" x2="298.6" y1="68" y2="468" stroke="#d1d9e0" stroke-width="1"/><text x="298.6" y="486" font-size="12" text-anchor="middle" fill="#59636e">−60%</text>
-<line x1="367.1" x2="367.1" y1="68" y2="468" stroke="#d1d9e0" stroke-width="1"/><text x="367.1" y="486" font-size="12" text-anchor="middle" fill="#59636e">−40%</text>
-<line x1="435.7" x2="435.7" y1="68" y2="468" stroke="#d1d9e0" stroke-width="1"/><text x="435.7" y="486" font-size="12" text-anchor="middle" fill="#59636e">−20%</text>
-<line x1="504.3" x2="504.3" y1="68" y2="468" stroke="#d1d9e0" stroke-width="2"/><text x="504.3" y="486" font-size="12" text-anchor="middle" fill="#59636e">0%</text>
-<line x1="572.9" x2="572.9" y1="68" y2="468" stroke="#d1d9e0" stroke-width="1"/><text x="572.9" y="486" font-size="12" text-anchor="middle" fill="#59636e">+20%</text>
-<line x1="641.4" x2="641.4" y1="68" y2="468" stroke="#d1d9e0" stroke-width="1"/><text x="641.4" y="486" font-size="12" text-anchor="middle" fill="#59636e">+40%</text>
-<line x1="710.0" x2="710.0" y1="68" y2="468" stroke="#d1d9e0" stroke-width="1"/><text x="710.0" y="486" font-size="12" text-anchor="middle" fill="#59636e">+60%</text>
+<line x1="230.0" x2="230.0" y1="68" y2="404" stroke="#d1d9e0" stroke-width="1"/><text x="230.0" y="422" font-size="12" text-anchor="middle" fill="#59636e">−80%</text>
+<line x1="298.6" x2="298.6" y1="68" y2="404" stroke="#d1d9e0" stroke-width="1"/><text x="298.6" y="422" font-size="12" text-anchor="middle" fill="#59636e">−60%</text>
+<line x1="367.1" x2="367.1" y1="68" y2="404" stroke="#d1d9e0" stroke-width="1"/><text x="367.1" y="422" font-size="12" text-anchor="middle" fill="#59636e">−40%</text>
+<line x1="435.7" x2="435.7" y1="68" y2="404" stroke="#d1d9e0" stroke-width="1"/><text x="435.7" y="422" font-size="12" text-anchor="middle" fill="#59636e">−20%</text>
+<line x1="504.3" x2="504.3" y1="68" y2="404" stroke="#d1d9e0" stroke-width="2"/><text x="504.3" y="422" font-size="12" text-anchor="middle" fill="#59636e">0%</text>
+<line x1="572.9" x2="572.9" y1="68" y2="404" stroke="#d1d9e0" stroke-width="1"/><text x="572.9" y="422" font-size="12" text-anchor="middle" fill="#59636e">+20%</text>
+<line x1="641.4" x2="641.4" y1="68" y2="404" stroke="#d1d9e0" stroke-width="1"/><text x="641.4" y="422" font-size="12" text-anchor="middle" fill="#59636e">+40%</text>
+<line x1="710.0" x2="710.0" y1="68" y2="404" stroke="#d1d9e0" stroke-width="1"/><text x="710.0" y="422" font-size="12" text-anchor="middle" fill="#59636e">+60%</text>
 <text x="0" y="92" font-size="13" font-weight="600" fill="#1f2328">Claude Opus 5.5, effort max</text><text x="0" y="109" font-size="12" fill="#59636e">cost, 18 task pairs</text>
 <g><title>Claude Opus 5.5, effort max, Occam: −51% [−58 … −42], 18 pairs</title><line x1="306.6" x2="361.2" y1="86" y2="86" stroke="#2a78d6" stroke-width="2"/><circle cx="330.5" cy="86" r="5" fill="#2a78d6"/></g><text x="369.2" y="90" font-size="12" font-weight="600" fill="#1f2328">−51%</text>
 <g><title>Claude Opus 5.5, effort max, Ponytail 4.10: −26% [−35 … −14], 18 pairs</title><line x1="383.2" x2="455.3" y1="104" y2="104" stroke="#eb6834" stroke-width="2"/><circle cx="416.3" cy="104" r="5" fill="#eb6834"/></g><text x="463.3" y="108" font-size="12" font-weight="600" fill="#1f2328">−26%</text>
@@ -27,7 +27,4 @@
 <text x="0" y="348" font-size="13" font-weight="600" fill="#1f2328">Claude Haiku 4.5</text><text x="0" y="365" font-size="12" fill="#59636e">cost, 18 task pairs</text>
 <g><title>Claude Haiku 4.5, Occam: −2% [−9 … +4], 18 pairs</title><line x1="474.8" x2="518.5" y1="342" y2="342" stroke="#2a78d6" stroke-width="2"/><circle cx="497.0" cy="342" r="5" fill="#2a78d6"/></g><text x="526.5" y="346" font-size="12" font-weight="600" fill="#1f2328">−2%</text>
 <g><title>Claude Haiku 4.5, Ponytail 4.10: +30% [+7 … +56], 18 pairs</title><line x1="527.6" x2="697.3" y1="360" y2="360" stroke="#eb6834" stroke-width="2"/><circle cx="605.6" cy="360" r="5" fill="#eb6834"/></g><text x="705.3" y="364" font-size="12" font-weight="600" fill="#1f2328">+30%</text>
-<text x="0" y="412" font-size="13" font-weight="600" fill="#1f2328">GPT-6 Astra in Codex, effort ultra</text><text x="0" y="429" font-size="12" fill="#59636e">total tokens, 17 task pairs</text>
-<g><title>GPT-6 Astra in Codex, effort ultra, Occam: −23% [−34 … −10], 17 pairs</title><line x1="386.7" x2="470.2" y1="406" y2="406" stroke="#2a78d6" stroke-width="2"/><circle cx="427.0" cy="406" r="5" fill="#2a78d6"/></g><text x="478.2" y="410" font-size="12" font-weight="600" fill="#1f2328">−23%</text>
-<g><title>GPT-6 Astra in Codex, effort ultra, Ponytail 4.10: +20% [−2 … +51], 17 pairs</title><line x1="497.6" x2="679.1" y1="424" y2="424" stroke="#eb6834" stroke-width="2"/><circle cx="572.9" cy="424" r="5" fill="#eb6834"/></g><text x="687.1" y="428" font-size="12" font-weight="600" fill="#1f2328">+20%</text>
 </svg>

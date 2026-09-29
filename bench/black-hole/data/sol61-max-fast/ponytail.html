@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#050609">
+  <title>Gargantua — A study in gravity</title>
+  <style>
+    :root { color-scheme: dark; font-family: Arial, Helvetica, sans-serif; color: #e8e5df; background: #050609; }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+    canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+    .interface { position: fixed; inset: 0; padding: 40px 48px 25px; display: flex; flex-direction: column; justify-content: space-between; pointer-events: none; }
+    header { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .brand { display: flex; align-items: center; gap: 15px; }
+    .brand svg { width: 33px; height: 33px; color: #c6b28c; }
+    h1 { font-size: 13px; font-weight: 500; letter-spacing: .32em; margin: 0 0 7px; }
+    .subtitle, .status, .eyebrow, .credits { font-size: 9px; font-weight: 400; letter-spacing: .2em; }
+    .subtitle { color: #77787c; }
+    .status { color: #92918d; display: flex; align-items: center; gap: 10px; }
+    .status-dot { width: 4px; height: 4px; border-radius: 50%; background: #e6bf77; box-shadow: 0 0 9px #d5a04e88; }
+    .status.paused .status-dot { background: #77787c; box-shadow: none; }
+    .lower { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 30px; }
+    .eyebrow { color: #a4957b; margin-bottom: 12px; font-size: 8px; }
+    h2 { font-family: Georgia, 'Times New Roman', serif; font-size: clamp(24px, 2.5vw, 34px); line-height: 1.12; font-weight: 400; letter-spacing: -.025em; margin: 0; color: #d9d6cf; }
+    .description { margin: 12px 0 0; font-size: 11px; line-height: 1.6; color: #797a7d; }
+    .playback { display: flex; flex-direction: column; align-items: end; gap: 14px; }
+    .time { font-family: 'Courier New', monospace; font-size: 10px; letter-spacing: .13em; color: #89847b; font-variant-numeric: tabular-nums; }
+    .controls { pointer-events: auto; display: flex; align-items: center; gap: 7px; }
+    button { display: flex; align-items: center; justify-content: center; gap: 10px; min-width: 108px; height: 40px; padding: 0 17px; border: 1px solid #a59d8b30; border-radius: 5px; background: #15151780; color: #c9c5bb; font: 11px Arial, Helvetica, sans-serif; letter-spacing: .04em; cursor: pointer; transition: border-color .2s, background .2s; backdrop-filter: blur(12px); }
+    button:hover { border-color: #c4ab7c80; background: #26231d90; }
+    button:focus-visible { outline: 2px solid #e8bd74; outline-offset: 4px; }
+    button svg { width: 12px; height: 12px; flex-shrink: 0; }
+    .credits { border-top: 1px solid #a59d8b1c; padding-top: 17px; display: flex; justify-content: space-between; gap: 20px; color: #64666b; font-size: 8px; letter-spacing: .15em; }
+    .credits span:last-child { color: #7f7a70; }
+    @media (max-width: 600px) {
+      .interface { padding: 25px 23px 20px; }
+      .brand { gap: 10px; }
+      h1 { font-size: 11px; letter-spacing: .24em; }
+      .subtitle { font-size: 7px; }
+      .status { font-size: 0; gap: 0; }
+      .lower { margin-bottom: 24px; gap: 18px; }
+      .eyebrow { font-size: 7px; letter-spacing: .13em; }
+      .description { max-width: 170px; font-size: 10px; }
+      .controls { gap: 6px; }
+      button { min-width: 0; height: 38px; padding: 0 11px; gap: 7px; font-size: 10px; }
+      .credits { font-size: 7px; letter-spacing: .09em; }
+      .credits .keyboard-hint { display: none; }
+    }
+    @media (max-height: 500px) {
+      .interface { padding: 20px 28px 15px; }
+      .lower { margin-bottom: 16px; }
+      h2 { font-size: 23px; }
+      .description { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="universe" role="img" aria-label="An animated black hole with a circular dark shadow, glowing golden accretion disk, and curved gravitationally lensed light."></canvas>
+  <main class="interface">
+    <header>
+      <div class="brand">
+        <svg viewBox="0 0 36 36" fill="none" aria-hidden="true"><circle cx="18" cy="18" r="9" stroke="currentColor" stroke-width=".8"/><ellipse cx="18" cy="18" rx="17" ry="4" transform="rotate(-24 18 18)" stroke="currentColor" stroke-width=".8"/><circle cx="18" cy="18" r="5" fill="#050609"/></svg>
+        <div><h1>GARGANTUA</h1><div class="subtitle">A STUDY IN GRAVITY</div></div>
+      </div>
+      <div class="status" id="status"><span class="status-dot"></span><span id="status-text">LIVE OBSERVATION</span></div>
+    </header>
+    <footer>
+      <div class="lower">
+        <div>
+          <div class="eyebrow">01 &nbsp; / &nbsp; AT THE EVENT HORIZON</div>
+          <h2>Beyond the<br>point of return.</h2>
+          <p class="description">Light bends. Time slips. The observer remains.</p>
+        </div>
+        <div class="playback">
+          <div class="time" id="time" aria-hidden="true">T + 00:00.00</div>
+          <div class="controls">
+            <button id="pause" type="button" aria-label="Pause animation" aria-pressed="false" title="Pause / Resume (Space)">
+              <svg id="pause-icon" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M2 1h2.5v10H2zm5.5 0H10v10H7.5z"/></svg><span id="pause-label">Pause</span>
+            </button>
+            <button id="restart" type="button" title="Restart from the initial scene (R)">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M3 5a5.5 5.5 0 1 1-.3 5M3 1v4h4"/></svg><span>Restart</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="credits"><span>INSPIRED BY INTERSTELLAR &nbsp; · &nbsp; PROCEDURAL LIGHT</span><span class="keyboard-hint">SPACE TO PAUSE &nbsp; / &nbsp; R TO RESTART</span></div>
+    </footer>
+  </main>
+
+  <script>
+  (() => {
+    'use strict';
+    const canvas = document.getElementById('universe');
+    const pauseButton = document.getElementById('pause');
+    const pauseLabel = document.getElementById('pause-label');
+    const pauseIcon = document.getElementById('pause-icon');
+    const status = document.getElementById('status');
+    const statusText = document.getElementById('status-text');
+    const clock = document.getElementById('time');
+    let elapsed = 0, previous = null, paused = false, frame = 0;
+    let render, resize;
+
+    // The only input to the scene is elapsed time. The noise and stars have a fixed seed.
+    const gl = canvas.getContext('webgl', { alpha: false, antialias: false, depth: false, preserveDrawingBuffer: true });
+    if (gl) {
+      const vertex = `
+        attribute vec2 aPosition;
+        varying vec2 vUV;
+        void main() { vUV = aPosition * .5 + .5; gl_Position = vec4(aPosition, 0., 1.); }
+      `;
+      const sceneSource = `
+        precision highp float;
+        varying vec2 vUV;
+        uniform vec2 uResolution;
+        uniform float uTime;
+        uniform sampler2D uNoise;
+        float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+        float noise(vec2 p) { return texture2D(uNoise, (p + .5) / 256.).r; }
+        float fbm(vec2 p) { return .55 * noise(p) + .28 * noise(p * 2.03 + 19.) + .17 * noise(p * 4.11 + 47.); }
+        vec3 heat(float r) {
+          float cooling = pow(smoothstep(1.15, 4.8, r), .65);
+          return mix(vec3(1., .82, .53), vec3(1., .235, .035), cooling);
+        }
+        float flow(float r, float phi) {
+          float angle = phi - uTime * (1.12 / pow(max(r, 1.), 1.25));
+          vec2 orbit = vec2(cos(angle), sin(angle)) * r;
+          float turbulence = fbm(orbit * 4. + vec2(r * 7., 0.));
+          float thread = noise(vec2(r * 29. + turbulence * 1.2, 18.3 + sin(angle * 2.) * .7));
+          float filament = pow(.5 + .5 * sin(r * 71. + turbulence * 2. + sin(angle * 3.) * .7), 5.);
+          float streak = pow(.5 + .5 * sin(angle * 9. + r * 5. + noise(orbit * 2.) * 3.), 12.);
+          float knot = pow(.5 + .5 * cos(angle - r * 2.3), 40.);
+          return (.12 + .8 * thread + .32 * filament) * (.35 + 1.4 * turbulence) + streak * .75 + knot * 1.65;
+        }
+        float stars(vec2 uv, float scale, float threshold) {
+          vec2 grid = uv * scale;
+          vec2 cell = floor(grid);
+          float seed = hash(cell);
+          vec2 position = vec2(hash(cell + 8.3), hash(cell + 27.1)) * .7 + .15;
+          float d = length(fract(grid) - position);
+          float size = .012 + .022 * hash(cell + 31.);
+          return step(threshold, seed) * exp(-d * d / (size * size)) * (.15 + seed * .55);
+        }
+        void main() {
+          vec2 p = (gl_FragCoord.xy - uResolution * .5) / (uResolution.y * .15);
+          float radius = length(p);
+          float phi = atan(p.y, p.x);
+          vec2 uv = gl_FragCoord.xy / uResolution.y;
+          vec3 light = vec3(.0008, .001, .0015);
+          float star = stars(uv, 27., .955) + stars(uv + 17., 12., .94);
+          light += vec3(.60, .68, .82) * star * .36;
+          light += vec3(.0008, .0009, .0013) * fbm(uv * 12.);
+
+          // A nearly edge-on disk, with angular features advected at different orbital speeds.
+          vec2 disk = vec2(p.x, p.y / .075);
+          float diskRadius = length(disk);
+          float diskAngle = atan(disk.y, disk.x);
+          float diskWindow = smoothstep(.95, 1.3, diskRadius) * (1. - smoothstep(3.4, 4.8, diskRadius));
+          float brightness = 2.5 * pow(1.3 / max(diskRadius, 1.3), 1.65);
+          float approaching = 1. + .32 * cos(diskAngle + 3.14);
+          light += heat(diskRadius) * flow(diskRadius, diskAngle) * diskWindow * brightness * approaching;
+
+          // Soft atmosphere around the disk and the lensed image, before optical bloom.
+          float spread = .11 + abs(p.x) * .026;
+          float diskGlow = exp(-pow(p.y / spread, 2.)) * exp(-pow(abs(p.x) / 3.9, 4.));
+          light += vec3(.13, .039, .008) * diskGlow;
+          light += vec3(.022, .009, .0025) * exp(-pow((radius - 1.24) / .32, 2.));
+
+          // The far side of the disk is bent into a broad upper arc and a compressed lower arc.
+          float elevation = abs(p.y) / max(radius, .001);
+          float upper = step(0., p.y);
+          float thickness = .025 + mix(.19, .52, upper) * pow(elevation, .72);
+          float lens = (radius - 1.018) / thickness;
+          float sourceRadius = 1.25 + lens * 3.6;
+          float arcWindow = smoothstep(0., .035, lens) * (1. - smoothstep(.65, 1., lens)) * smoothstep(.015, .20, elevation);
+          float arcAngle = phi + .3 * lens * sign(p.y);
+          float arc = flow(max(sourceRadius, 1.), arcAngle);
+          float arcPower = mix(1.6, 2.8, upper) * pow(1.3 / max(sourceRadius, 1.3), 1.45);
+          light += heat(sourceRadius) * arc * arcWindow * arcPower * (1. - .18 * cos(phi));
+
+          // A thin photon rim. Keep the interior absolutely dark, including the background stars.
+          float rim = 8.5 * exp(-pow((radius - 1.012) / .008, 2.));
+          rim += 1.3 * exp(-pow((radius - 1.034) / .012, 2.));
+          light += vec3(1., .79, .47) * rim * (.88 - .12 * cos(phi));
+          if (radius < 1.) light = vec3(0.);
+          // Gamma-encoded HDR preserves shadow detail in ordinary 8-bit WebGL textures.
+          gl_FragColor = vec4(pow(light / (1. + light), vec3(.454545)), 1.);
+        }
+      `;
+      const blurSource = `
+        precision highp float;
+        varying vec2 vUV;
+        uniform sampler2D uImage;
+        uniform vec2 uDirection;
+        uniform float uThreshold;
+        vec3 sampleLight(vec2 uv) {
+          vec3 c = pow(texture2D(uImage, uv).rgb, vec3(2.2));
+          c = c / max(vec3(.004), 1. - c);
+          return max(vec3(0.), c - uThreshold);
+        }
+        void main() {
+          vec3 c = sampleLight(vUV) * .227027;
+          c += sampleLight(vUV + uDirection * 1.384615) * .316216;
+          c += sampleLight(vUV - uDirection * 1.384615) * .316216;
+          c += sampleLight(vUV + uDirection * 3.230769) * .070270;
+          c += sampleLight(vUV - uDirection * 3.230769) * .070270;
+          gl_FragColor = vec4(pow(c / (1. + c), vec3(.454545)), 1.);
+        }
+      `;
+      const compositeSource = `
+        precision highp float;
+        varying vec2 vUV;
+        uniform sampler2D uImage;
+        uniform sampler2D uBloom;
+        uniform vec2 uResolution;
+        uniform float uTime;
+        vec3 decode(vec3 c) { c = pow(c, vec3(2.2)); return c / max(vec3(.004), 1. - c); }
+        void main() {
+          vec3 c = decode(texture2D(uImage, vUV).rgb);
+          c += decode(texture2D(uBloom, vUV).rgb) * .35;
+          c = 1. - exp(-c * 1.1);
+          c = pow(c, vec3(.454545));
+          vec2 screen = vUV * 2. - 1.;
+          c *= 1. - .22 * dot(screen * .65, screen * .65);
+          float grain = fract(sin(dot(gl_FragCoord.xy + floor(uTime * 24.), vec2(12.9898, 78.233))) * 43758.5453) - .5;
+          c += grain * .012 * smoothstep(.0, .12, max(c.r, max(c.g, c.b)));
+          vec2 p = (gl_FragCoord.xy - uResolution * .5) / (uResolution.y * .15);
+          c *= smoothstep(.96, 1., length(p));
+          gl_FragColor = vec4(c, 1.);
+        }
+      `;
+      function program(source, names) {
+        const p = gl.createProgram();
+        for (const [type, code] of [[gl.VERTEX_SHADER, vertex], [gl.FRAGMENT_SHADER, source]]) {
+          const shader = gl.createShader(type);
+          gl.shaderSource(shader, code);
+          gl.compileShader(shader);
+          if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(shader));
+          gl.attachShader(p, shader);
+          gl.deleteShader(shader);
+        }
+        gl.bindAttribLocation(p, 0, 'aPosition');
+        gl.linkProgram(p);
+        if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
+        return { value: p, uniforms: Object.fromEntries(names.map(name => [name, gl.getUniformLocation(p, name)])) };
+      }
+      const scene = program(sceneSource, ['uResolution', 'uTime', 'uNoise']);
+      const blur = program(blurSource, ['uImage', 'uDirection', 'uThreshold']);
+      const composite = program(compositeSource, ['uImage', 'uBloom', 'uResolution', 'uTime']);
+      const quad = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+      gl.enableVertexAttribArray(0);
+      gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+
+      function texture() {
+        const t = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, t);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        return t;
+      }
+      function target() {
+        const t = texture(), f = gl.createFramebuffer();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, f);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, t, 0);
+        return { texture: t, framebuffer: f };
+      }
+      const image = target(), bloomA = target(), bloomB = target();
+      const noiseTexture = texture();
+      const noiseData = new Uint8Array(256 * 256);
+      let seed = 73129;
+      for (let i = 0; i < noiseData.length; i++) {
+        seed ^= seed << 13; seed ^= seed >>> 17; seed ^= seed << 5;
+        noiseData[i] = seed & 255;
+      }
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE, 256, 256, 0, gl.LUMINANCE, gl.UNSIGNED_BYTE, noiseData);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+      let width, height, bloomWidth, bloomHeight;
+      resize = () => {
+        const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
+        width = canvas.width = Math.max(1, Math.round(innerWidth * pixelRatio));
+        height = canvas.height = Math.max(1, Math.round(innerHeight * pixelRatio));
+        bloomWidth = Math.max(1, Math.floor(width / 2));
+        bloomHeight = Math.max(1, Math.floor(height / 2));
+        for (const [t, w, h] of [[image, width, height], [bloomA, bloomWidth, bloomHeight], [bloomB, bloomWidth, bloomHeight]]) {
+          gl.bindTexture(gl.TEXTURE_2D, t.texture);
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+        }
+      };
+      render = time => {
+        gl.useProgram(scene.value);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, image.framebuffer);
+        gl.viewport(0, 0, width, height);
+        gl.uniform2f(scene.uniforms.uResolution, width, height);
+        gl.uniform1f(scene.uniforms.uTime, time);
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, noiseTexture);
+        gl.uniform1i(scene.uniforms.uNoise, 1);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+        gl.useProgram(blur.value);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, bloomA.framebuffer);
+        gl.viewport(0, 0, bloomWidth, bloomHeight);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, image.texture);
+        gl.uniform1i(blur.uniforms.uImage, 0);
+        gl.uniform2f(blur.uniforms.uDirection, 3 / width, 0);
+        gl.uniform1f(blur.uniforms.uThreshold, .6);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+        gl.bindFramebuffer(gl.FRAMEBUFFER, bloomB.framebuffer);
+        gl.bindTexture(gl.TEXTURE_2D, bloomA.texture);
+        gl.uniform2f(blur.uniforms.uDirection, 0, 3 / height);
+        gl.uniform1f(blur.uniforms.uThreshold, 0);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+        gl.useProgram(composite.value);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        gl.viewport(0, 0, width, height);
+        gl.bindTexture(gl.TEXTURE_2D, image.texture);
+        gl.uniform1i(composite.uniforms.uImage, 0);
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, bloomB.texture);
+        gl.uniform1i(composite.uniforms.uBloom, 1);
+        gl.uniform2f(composite.uniforms.uResolution, width, height);
+        gl.uniform1f(composite.uniforms.uTime, time);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        gl.activeTexture(gl.TEXTURE0);
+      };
+    } else {
+      // A procedural canvas fallback keeps the scene and controls usable without WebGL.
+      const ctx = canvas.getContext('2d', { alpha: false });
+      resize = () => { canvas.width = innerWidth; canvas.height = innerHeight; };
+      render = time => {
+        const w = canvas.width, h = canvas.height, r = h * .15;
+        ctx.fillStyle = '#050609'; ctx.fillRect(0, 0, w, h);
+        ctx.save(); ctx.translate(w / 2, h / 2);
+        const halo = ctx.createRadialGradient(0, 0, r, 0, 0, r * 2.5);
+        halo.addColorStop(0, '#a76b202b'); halo.addColorStop(1, '#00000000');
+        ctx.fillStyle = halo; ctx.fillRect(-w / 2, -h / 2, w, h);
+        ctx.save(); ctx.scale(1, .1);
+        const diskGlow = ctx.createRadialGradient(0, 0, r, 0, 0, r * 4.7);
+        diskGlow.addColorStop(0, '#ffc97450'); diskGlow.addColorStop(.5, '#dc752328'); diskGlow.addColorStop(1, '#00000000');
+        ctx.fillStyle = diskGlow; ctx.fillRect(-w / 2, -h * 5, w, h * 10); ctx.restore();
+        ctx.globalCompositeOperation = 'lighter';
+        for (let i = 80; i > 0; i--) {
+          const radius = r * (1.05 + i / 24), angle = time * .9 / Math.pow(radius / r, 1.25);
+          const color = `hsla(${43 - i * .28}, 95%, ${80 - i * .5}%, ${.12 + .16 * Math.sin(i * 1.9 + angle) ** 2})`;
+          ctx.strokeStyle = color; ctx.lineWidth = 1.3;
+          ctx.beginPath(); ctx.ellipse(0, 0, radius, radius * .075, 0, 0, Math.PI * 2); ctx.stroke();
+          ctx.strokeStyle = '#ffdc9680'; ctx.lineWidth = 2;
+          for (let j = 0; j < 3; j++) {
+            ctx.beginPath(); ctx.ellipse(0, 0, radius, radius * .075, 0, angle + j * 2.1 + i * .7, angle + j * 2.1 + i * .7 + .24); ctx.stroke();
+          }
+          if (i < 24) {
+            ctx.strokeStyle = color;
+            ctx.lineWidth = .8; ctx.beginPath(); ctx.ellipse(0, 0, r * (1.015 + i * .021), r * (1.015 + i * .021), 0, Math.PI, Math.PI * 2); ctx.stroke();
+            ctx.beginPath(); ctx.ellipse(0, 0, r * (1.015 + i * .008), r * (1.015 + i * .008), 0, 0, Math.PI); ctx.stroke();
+          }
+        }
+        ctx.globalCompositeOperation = 'source-over'; ctx.shadowBlur = 0;
+        ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#fff1cd'; ctx.lineWidth = 1.2; ctx.shadowBlur = 14; ctx.shadowColor = '#ffc35d';
+        ctx.beginPath(); ctx.arc(0, 0, r * 1.01, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
+      };
+    }
+
+    function updateControls() {
+      pauseLabel.textContent = paused ? 'Resume' : 'Pause';
+      pauseButton.setAttribute('aria-label', paused ? 'Resume animation' : 'Pause animation');
+      pauseButton.setAttribute('aria-pressed', String(paused));
+      pauseIcon.innerHTML = paused ? '<path d="M2 1l9 5-9 5z"/>' : '<path d="M2 1h2.5v10H2zm5.5 0H10v10H7.5z"/>';
+      status.classList.toggle('paused', paused);
+      statusText.textContent = paused ? 'OBSERVATION PAUSED' : 'LIVE OBSERVATION';
+    }
+    function draw() {
+      render(elapsed);
+      const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
+      const seconds = (elapsed % 60).toFixed(2).padStart(5, '0');
+      clock.textContent = `T + ${minutes}:${seconds}`;
+    }
+    function tick(now) {
+      if (previous !== null) elapsed += (now - previous) / 1000;
+      previous = now;
+      draw();
+      frame = requestAnimationFrame(tick);
+    }
+    function togglePause() {
+      paused = !paused;
+      if (paused) {
+        cancelAnimationFrame(frame);
+        previous = null;
+      } else {
+        previous = null;
+        frame = requestAnimationFrame(tick);
+      }
+      updateControls();
+    }
+    function restart() {
+      cancelAnimationFrame(frame);
+      elapsed = 0; previous = null; paused = false;
+      updateControls(); draw();
+      frame = requestAnimationFrame(tick);
+    }
+    pauseButton.addEventListener('click', togglePause);
+    document.getElementById('restart').addEventListener('click', restart);
+    document.addEventListener('keydown', event => {
+      if (event.altKey || event.ctrlKey || event.metaKey || event.repeat) return;
+      if (event.code === 'Space' && !event.target.closest('button')) { event.preventDefault(); togglePause(); }
+      if (event.code === 'KeyR') restart();
+    });
+    window.addEventListener('resize', () => { resize(); draw(); });
+    document.addEventListener('visibilitychange', () => {
+      // Returning to the tab continues the phase without a jump through hidden time.
+      previous = null;
+    });
+    resize(); draw();
+    frame = requestAnimationFrame(tick);
+  })();
+  </script>
+</body>
+</html>

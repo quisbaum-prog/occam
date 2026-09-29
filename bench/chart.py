@@ -55,11 +55,7 @@ def svg(data, c, title, fmt, tfmt, ticks, xmax):  # median per scenario and arm;
 
 
 def load(src):
-    return [json.loads(l) for l in Path(src).read_text().splitlines() if l.strip()]
-
-
-def codex_total(r):  # incomplete usage (interrupted subagent) is excluded, as in report_codex.py
-    return r["all_usage"].get("total") if r.get("usage_complete") and r.get("valid_run") else None
+    return [json.loads(l) for l in Path(src).read_text(encoding="utf-8").splitlines() if l.strip()]
 
 
 def reviewed_pass(r):  # the documented source review where one exists, else the verifier
@@ -85,9 +81,6 @@ PER_SCENARIO = [
      lambda r: r["cost"], lambda r: r["pass"], lambda v: f"${v:.3f}", usd, (0, 0.02, 0.04, 0.06, 0.08, 0.1), 0.12),
     ("cost-per-scenario-haiku", "results/haiku-v1.jsonl", "Median cost per task, Claude Haiku 4.5, USD at list price",
      lambda r: r["cost"], lambda r: r["pass"], lambda v: f"${v:.3f}", usd, (0, 0.05, 0.1, 0.15, 0.2), 0.25),
-    ("tokens-per-scenario-astra", "results/2026-09-27-astra-ultra.jsonl",
-     "Median total tokens per task, GPT-6 Astra (effort ultra) in Codex", codex_total, reviewed_pass,
-     lambda v: f"{v / 1000:.0f}k", lambda v: f"{v // 1000:.0f}k" if v else "0", (0, 200_000, 400_000, 600_000), 700_000),
 ]
 
 
@@ -98,7 +91,6 @@ SETUPS = [
     ("Claude Sonnet 5.5, effort max", "cost", "results/sonnet-max.jsonl", lambda r: r["cost"]),
     ("Claude Sonnet 5.5, effort medium", "cost", "results/sonnet-medium.jsonl", lambda r: r["cost"]),
     ("Claude Haiku 4.5", "cost", "results/haiku-v1.jsonl", lambda r: r["cost"]),
-    ("GPT-6 Astra in Codex, effort ultra", "total tokens", "results/2026-09-27-astra-ultra.jsonl", codex_total),
 ]
 
 
@@ -164,7 +156,7 @@ def per_scenario(rows, get, passed):  # {scenario: {arm: (median value, passed r
 def write(out, name, render):
     Path(out).mkdir(parents=True, exist_ok=True)
     for theme, colors in THEMES.items():
-        Path(out, f"{name}-{theme}.svg").write_text(render(colors))
+        Path(out, f"{name}-{theme}.svg").write_text(render(colors), encoding="utf-8")
 
 
 def main(out):

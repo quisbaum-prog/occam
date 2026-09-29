@@ -1,0 +1,9 @@
+<!doctype html><meta charset="utf-8"><title>Intentionally broken controls</title>
+<style>body{margin:0;background:#030309;color:white;overflow:hidden}canvas{display:block}nav{position:fixed;bottom:30px;left:40%}</style>
+<canvas id="scene" width="1280" height="800"></canvas>
+<nav><button onclick="this.textContent='Resume'">Pause</button><button>Restart</button></nav>
+<script>
+const ctx=document.getElementById('scene').getContext('2d');let phase=0,last=performance.now();
+function draw(now){phase+=(now-last)/1000*.7;last=now;ctx.fillStyle='#030309';ctx.fillRect(0,0,1280,800);ctx.save();ctx.translate(640,400);ctx.rotate(phase);ctx.fillStyle='#fff0a0';ctx.fillRect(120,-40,180,80);ctx.restore();requestAnimationFrame(draw)}
+requestAnimationFrame(draw);
+</script>
